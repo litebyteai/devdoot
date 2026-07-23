@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Devdoot Diagnostics Viewer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #090a0f;
+      --bg-card: rgba(17, 19, 31, 0.85);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --info: #06b6d4;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.1) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(6, 182, 212, 0.08) 0px, transparent 50%);
+      background-attachment: fixed;
+      font-family: 'Outfit', sans-serif;
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 24px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 20px;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      background: linear-gradient(135deg, var(--accent), var(--info));
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 20px;
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+    }
+
+    .logo-text h1 {
+      font-size: 24px;
+      font-weight: 700;
+      background: linear-gradient(to right, #ffffff, #9ca3af);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .logo-text p {
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .search-input {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 8px 16px;
+      color: inherit;
+      font-family: inherit;
+      outline: none;
+      font-size: 14px;
+      width: 300px;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+    }
+
+    .btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn:hover {
+      background: var(--accent-hover);
+    }
+
+    /* Terminal Window */
+    .terminal-window {
+      flex: 1;
+      background: rgba(10, 11, 18, 0.95);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+    }
+
+    .terminal-header {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #ef4444; }
+    .dot-yellow { background: #f59e0b; }
+    .dot-green { background: #10b981; }
+
+    .terminal-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-left: 12px;
+    }
+
+    .terminal-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre;
+      color: #e5e7eb;
+    }
+
+    .line {
+      display: block;
+      min-height: 1.6em;
+    }
+
+    /* Syntax Highlighting */
+    .level-info { color: var(--success); font-weight: bold; }
+    .level-warn { color: var(--warning); font-weight: bold; }
+    .level-error { color: var(--error); font-weight: bold; }
+    .level-trace { color: var(--info); font-weight: bold; }
+    .level-debug { color: var(--accent); font-weight: bold; }
+    .path-link { color: #818cf8; text-decoration: underline; opacity: 0.85; }
+    .group-tag { color: #f472b6; font-weight: bold; }
+    .timestamp { color: #9ca3af; }
+    .offset { color: var(--info); }
+    .header-delim { color: #f59e0b; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-container">
+      <div class="logo-icon">D</div>
+      <div class="logo-text">
+        <h1>Devdoot Diagnostics</h1>
+        <p>Plain-Text Diagnostics Viewer</p>
+      </div>
+    </div>
+    <div class="actions">
+      <input type="text" id="search" class="search-input" placeholder="Filter log lines..." oninput="filterLines()">
+      <button class="btn" onclick="copyToClipboard()">Copy to Clipboard</button>
+    </div>
+  </header>
+
+  <div class="terminal-window">
+    <div class="terminal-header">
+      <div class="dot dot-red"></div>
+      <div class="dot dot-yellow"></div>
+      <div class="dot dot-green"></div>
+      <div class="terminal-title" id="file-title">diagnostics.txt</div>
+    </div>
+    <div class="terminal-body" id="terminal-body">
+      <!-- Plain text log contents will be loaded here -->
+    </div>
+  </div>
+
+  <script>
+    let rawText = '';
+
+    async function loadData() {
+      try {
+        const res = await fetch('/api/data');
+        if (!res.ok) throw new Error('Failed to fetch trace data');
+        rawText = await res.text();
+        
+        // Extract file name from header if possible
+        const idMatch = rawText.match(/Report ID:\s+(.+)/);
+        if (idMatch) {
+          document.getElementById('file-title').textContent = `report-${idMatch[1].trim()}.txt`;
+        } else {
+          const traceMatch = rawText.match(/Trace ID:\s+(.+)/);
+          if (traceMatch) {
+            document.getElementById('file-title').textContent = `trace-${traceMatch[1].trim()}.txt`;
+          }
+        }
+
+        renderText(rawText);
+      } catch (err) {
+        document.getElementById('terminal-body').innerHTML = `
+          <span style="color:var(--error); font-weight:bold;">⚠️ Error loading diagnostics report</span>
+          <span style="color:var(--text-muted)">${err.message}</span>
+        `;
+      }
+    }
+
+    function renderText(text) {
+      const container = document.getElementById('terminal-body');
+      container.innerHTML = '';
+
+      const lines = text.split('\n');
+      lines.forEach(lineText => {
+        const lineSpan = document.createElement('span');
+        lineSpan.className = 'line';
+        lineSpan.innerHTML = highlightSyntax(lineText);
+        container.appendChild(lineSpan);
+      });
+    }
+
+    function highlightSyntax(line) {
+      // Escape HTML
+      let html = line
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+      // Highlight Levels
+      html = html.replace(/\[(INFO)\]/g, '<span class="level-info">[$1]</span>');
+      html = html.replace(/\[(WARN)\]/g, '<span class="level-warn">[$1]</span>');
+      html = html.replace(/\[(ERROR)\]/g, '<span class="level-error">[$1]</span>');
+      html = html.replace(/\[(TRACE)\]/g, '<span class="level-trace">[$1]</span>');
+      html = html.replace(/\[(DEBUG)\]/g, '<span class="level-debug">[$1]</span>');
+
+      // Highlight groups, e.g. [GroupName] followed by a space
+      html = html.replace(/(\[[A-Z]+\]\s+)\[([^\]]+)\]/g, '$1[<span class="group-tag">$2</span>]');
+
+      // Highlight file paths: e.g. [D:\path\to\file.ts:12:34] or [file.ts:12:34]
+      html = html.replace(/\[([^\]:]+:\d+:\d+)\]/g, '[<span class="path-link">$1</span>]');
+
+      // Highlight relative offsets: e.g. [+12ms] or [+0ms]
+      html = html.replace(/\[(\+\d+ms)\]/g, '[<span class="offset">$1</span>]');
+
+      // Highlight timestamps: e.g. 23:30:08.456
+      html = html.replace(/^(\d{2}:\d{2}:\d{2}\.\d{3})/g, '<span class="timestamp">$1</span>');
+
+      // Highlight major headers: === SECTION === or --- SECTION ---
+      html = html.replace(/^([=\-]{3,}.+[=\-]{3,})$/g, '<span class="header-delim">$1</span>');
+
+      return html;
+    }
+
+    function filterLines() {
+      const query = document.getElementById('search').value.toLowerCase();
+      const container = document.getElementById('terminal-body');
+      container.innerHTML = '';
+
+      const lines = rawText.split('\n');
+      lines.forEach(lineText => {
+        if (!query || lineText.toLowerCase().includes(query)) {
+          const lineSpan = document.createElement('span');
+          lineSpan.className = 'line';
+          lineSpan.innerHTML = highlightSyntax(lineText);
+          container.appendChild(lineSpan);
+        }
+      });
+    }
+
+    function copyToClipboard() {
+      navigator.clipboard.writeText(rawText).then(() => {
+        const btn = document.querySelector('.btn');
+        const originalText = btn.textContent;
+        btn.textContent = 'Copied!';
+        btn.style.background = 'var(--success)';
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.style.background = '';
+        }, 1500);
+      });
+    }
+
+    window.onload = loadData;
+  </script>
+</body>
+</html>
