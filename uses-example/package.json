@@ -1,0 +1,16 @@
+{
+  "name": "devdoot-uses-example",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "demo": "tsx demo.ts",
+    "express": "tsx express-demo.ts",
+    "axios": "tsx axios-demo.ts"
+  },
+  "dependencies": {
+    "devdoot": "file:..",
+    "express": "^4.19.2",
+    "axios": "^1.7.2",
+    "tsx": "^4.23.1"
+  }
+}
