@@ -1,6 +1,6 @@
 {
-  "name": "@litebyteai/devdoot",
-  "version": "0.0.1",
+  "name": "devdoot",
+  "version": "0.0.2",
   "type": "module",
   "description": "High-performance developer diagnostics, structured execution tracing, and global crash reporting engine for Node.js",
   "main": "./dist/index.cjs",
