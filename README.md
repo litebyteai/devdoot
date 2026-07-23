@@ -3,8 +3,8 @@
 ### *The Intelligent, High-Performance Developer Diagnostics & Tracing Engine for Node.js*
 
 [![NPM Version](https://img.shields.io/npm/v/devdoot.svg?style=flat-square)](https://www.npmjs.com/package/devdoot)
-[![License](https://img.shields.io/npm/l/devdoot.svg?style=flat-square)](https://github.com/your-username/devdoot/blob/main/LICENSE)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/your-username/devdoot/test.yml?branch=main)](https://github.com/your-username/devdoot/actions)
+[![License](https://img.shields.io/npm/l/devdoot.svg?style=flat-square)](https://github.com/litebyteai/devdoot/blob/main/LICENSE)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/litebyteai/devdoot/test.yml?branch=main)](https://github.com/litebyteai/devdoot/actions)
 
 **Devdoot** is a lightweight, zero-overhead developer diagnostics and distributed tracing platform for Node.js applications. It isn't just another logger—it is a comprehensive runtime observer designed to help you instantly understand *what happened*, *when it happened*, *where it happened*, and *why it failed*, without polluting your codebase with manual logging statements.
 
