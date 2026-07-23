@@ -54,6 +54,22 @@ pnpm add devdoot
 
 ---
 
+## 📂 Examples Sub-Project
+
+For a fully-configured, runnable project showing how to integrate `devdoot` in real-world scenarios, check out the [uses-example](file:///d:/Projects/nodejs/automation/devdoot/uses-example) folder. It contains copy-pasteable implementations of:
+- **`demo.ts`**: Logging levels, nested traces, and crash reporting.
+- **`express-demo.ts`**: HTTP middleware tracing.
+- **`axios-demo.ts`**: Cross-network trace header propagation.
+
+To run them, navigate to the folder and install dependencies:
+```bash
+cd uses-example
+npm install
+npm run demo
+```
+
+---
+
 ## 🚀 Quick Start
 
 Here is a quick example showing how easily you can instrument your Node.js/TypeScript application:
