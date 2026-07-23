@@ -54,16 +54,24 @@ pnpm add devdoot
 
 ---
 
-## 📂 Examples Sub-Project
+## 📂 Examples Sub-Projects
 
-For a fully-configured, runnable project showing how to integrate `devdoot` in real-world scenarios, check out the [uses-example](file:///d:/Projects/nodejs/automation/devdoot/uses-example) folder. It contains copy-pasteable implementations of:
+For fully-configured, runnable projects showing how to integrate `devdoot` in real-world scenarios, check out the [uses-example](file:///d:/Projects/nodejs/automation/devdoot/uses-example) folder. It contains two isolated sub-folders:
+
+### 1. [JavaScript Node.js Example](file:///d:/Projects/nodejs/automation/devdoot/uses-example/node-js)
+Contains pure ES Module JavaScript examples:
+- **`demo.js`**: Logging levels, groups, nested traces, and crash reporting.
+- **`express-demo.js`**: HTTP middleware tracing.
+
+### 2. [TypeScript Example](file:///d:/Projects/nodejs/automation/devdoot/uses-example/typescript)
+Contains standard TypeScript examples utilizing type definitions and a compiler config (`tsconfig.json`):
 - **`demo.ts`**: Logging levels, nested traces, and crash reporting.
 - **`express-demo.ts`**: HTTP middleware tracing.
 - **`axios-demo.ts`**: Cross-network trace header propagation.
 
-To run them, navigate to the folder and install dependencies:
+To run any of the examples, navigate to the folder, install the NPM package, and start the demo:
 ```bash
-cd uses-example
+cd uses-example/node-js # or cd uses-example/typescript
 npm install
 npm run demo
 ```

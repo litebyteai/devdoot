@@ -1,0 +1,13 @@
+{
+  "name": "devdoot-example-nodejs",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "demo": "node demo.js",
+    "express": "node express-demo.js"
+  },
+  "dependencies": {
+    "devdoot": "^0.0.2",
+    "express": "^4.19.2"
+  }
+}
