@@ -1,8 +1,8 @@
 {
-  "name": "devdoot",
-  "version": "0.1.0",
+  "name": "@litebyteai/devdoot",
+  "version": "0.0.1",
   "type": "module",
-  "description": "A TypeScript library",
+  "description": "High-performance developer diagnostics, structured execution tracing, and global crash reporting engine for Node.js",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -24,6 +24,17 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/litebyteai/devdoot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/litebyteai/devdoot/issues"
+  },
+  "homepage": "https://github.com/litebyteai/devdoot#readme",
   "scripts": {
     "build": "tsup",
     "test": "vitest run",
@@ -31,8 +42,19 @@
     "example": "tsx examples/demo.ts",
     "prepublishOnly": "npm run build"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "logging",
+    "tracing",
+    "diagnostics",
+    "observability",
+    "crash-reporting",
+    "unhandled-exceptions",
+    "async-local-storage",
+    "context-propagation",
+    "performance",
+    "developer-experience"
+  ],
+  "author": "LiteByteAI",
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^22.20.1",
