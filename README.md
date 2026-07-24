@@ -78,116 +78,110 @@ npm run demo
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start & Integration Guides
 
-Here is a quick example showing how easily you can instrument your Node.js/TypeScript application:
+`devdoot` can be integrated from a basic zero-config setup up to advanced deep-diagnostics configurations. Here are the three main integration paths:
+
+### 1️⃣ Level 1: Out-of-the-Box (Zero-Config)
+By default, `devdoot` runs completely in-memory and outputs straight to the terminal. It writes **zero files to disk** and does **zero environment variable lookups** automatically—giving you maximum security and performance.
 
 ```typescript
-import devdoot, { runTraced, Devdoot } from 'devdoot';
+import devdoot, { runTraced } from 'devdoot';
 
-// 1. Configure the logger
-devdoot.configure({
-  level: 'trace',
-  saveTraces: true, // Write successful traces to storage/devdoot/traces/
-  deepDebugging: true
-});
+// Start using immediately!
+devdoot.info('Hello from devdoot!');
 
-// 2. Set an active group for the logger
-devdoot.group('DatabaseModule');
-devdoot.info('Connecting to the database...'); 
-// Output: [INFO] [DatabaseModule] Connecting to the database... [examples/demo.ts:13:10] [+3ms]
+// Use groups to filter/organize logs dynamically
+devdoot.group('BillingService').info('Invoice #1024 paid.');
 
-// 3. Create nested execution traces with automatic context propagation
-runTraced('MainJob', async (trace) => {
-  trace.info('Starting MainJob process');
+// Create traces to track execution hierarchy and latencies
+runTraced('MainJob', (trace) => {
+  trace.info('Job started');
   
-  // Call internal functions; they automatically inherit the parent trace and group!
-  await performSubtask();
-  
-  trace.info('MainJob completed successfully');
+  // Sub-tasks automatically link to this parent trace!
+  runTraced('SubTask', (subTrace) => {
+    subTrace.info('Performing work');
+  });
 });
-
-async function performSubtask() {
-  // Uses active context 'MainJob' automatically!
-  devdoot.info('Performing nested database query'); 
-}
 ```
 
-See [examples/demo.ts](file:///D:/Projects/nodejs/automation/devdoot/examples/demo.ts) for a complete working showcase.
-
----
-
-## 🚨 Global Process Event & Error Tracking (Recommended)
-
-In production or large-scale environments, capturing unhandled exceptions, unhandled rejections, and system termination events is critical. `devdoot` provides a unified `register()` method to automatically hook into these process-level events.
-
-When any of these events are triggered, `devdoot` automatically generates and writes a detailed JSON diagnostic report (including the error stack, active tracing contexts, and current system/process diagnostics) to the `storage/devdoot/reports/` directory.
-
-> [!IMPORTANT]
-> **Project-Level Usage:** This method should be called once at the root entry point of your application (e.g. `index.ts` or `server.ts`). Avoid calling this within library code.
->
-> **Multi-Installation / Dependency Protection:** If `devdoot` is installed across multiple sub-dependencies, calling `register()` is completely idempotent and safe. It utilizes a global process-level `Symbol` to guarantee that each event handler is registered at most once, preventing duplicate logs/handlers.
+### 2️⃣ Level 2: Opt-In Local Logging (Files)
+Enable filesystem log output and automated crash reporting. Under this setup, successful execution traces are written to disk, and process crashes are preserved as detailed `.txt` diagnostics.
 
 ```typescript
 import devdoot from 'devdoot';
 
-// Register all handlers at your app's entry point
-devdoot.register({
-  // Optionally customize what gets registered
-  uncaughtException: true,
-  unhandledRejection: true,
-  beforeExit: true,        // Writes a report to disk upon process finish
-  exit: true,              // Writes a report to disk upon process exit (if not already written)
-  sigint: true,            // Writes a report to disk on Ctrl+C, then exits
-  sigterm: true,           // Writes a report to disk on termination signal, then exits
-  multipleResolves: true,  // Writes a report to disk on multiple promise resolves/rejections
-  exitOnError: true        // when true, terminates the process on uncaughtException/unhandledRejection (default: true)
+// 1. Enable local trace saving to files
+devdoot.configure({
+  saveTraces: true // Writes completed traces to storage/devdoot/traces/*.txt
+});
+
+// 2. Register process-level event monitoring
+// Saves detailed reports to storage/devdoot/reports/ on exit, SIGINT, or crash.
+devdoot.register();
+```
+
+### 3️⃣ Level 3: Deep Debugging & Secure Opt-In Env loading
+For large production environments or active debug sessions, you can enable deep debugging, filter by specific logging groups, and securely opt-in to loading configs from environment variables.
+
+```typescript
+import devdoot from 'devdoot';
+
+devdoot.configure({
+  level: 'trace',
+  deepDebugging: true,
+  deepDebugGroups: ['AuthSystem', 'DatabaseQuery'],
+  outputDir: 'var/logs/devdoot',
+  
+  // SECURE OPT-IN:
+  // Allow Devdoot to securely look up environment configs from process['env'].
+  // If false (default), environment lookups are disabled for maximum security.
+  allowEnv: true
 });
 ```
 
 ---
 
-## 🛠️ Configuration
+## 🛠️ Complete Configuration Reference
 
-`devdoot` can be configured both **programmatically** and via **environment variables**.
+`devdoot` properties can be configured programmatically or securely loaded from environment variables (when `allowEnv: true` is configured).
 
-### Programmatic Configuration
+### Configuration Options & Env Variables
 
-Configure the global logger or instantiate multiple isolated logger instances:
+| Programmatic Option | Env Variable | Default | Benefit & Security Context |
+| :--- | :--- | :--- | :--- |
+| **`allowEnv`** | *N/A* | `false` | **Security Toggle.** If `false`, `devdoot` never accesses `process['env']`, preventing env scanning. |
+| **`saveTraces`** | `DEVDOOT_SAVE_TRACES` | `false` | Writes successful traces to `.txt` files. Keeps production clean when disabled. |
+| **`enabled`** | `DEVDOOT_ENABLED` | `true` | Quickly turn off all logger formatting and telemetry hooks. |
+| **`level`** | `DEVDOOT_LEVEL` | `'info'` | Filters log statements (`trace`, `debug`, `info`, `warn`, `error`). |
+| **`format`** | `DEVDOOT_FORMAT` | `'console'` | Outputs log files as human-friendly `'console'` terminal lines or raw `'json'`. |
+| **`deepDebugging`** | `DEVDOOT_DEEP_DEBUGGING` | `false` | Performance bypass. When `false`, calling `devdoot.debug()` returns a frozen `NOOP` instance (running at **60M+ ops/sec**). |
+| **`deepDebugGroups`** | `DEVDOOT_DEEP_DEBUG_GROUPS` | `All` | Filters debug logs to only show specific group logs. |
+| **`outputDir`** | `DEVDOOT_OUTPUT_DIR` | `'storage/devdoot'` | Destination folder for local traces and crash reports. |
+
+---
+
+## 🚨 Process Exit & Crash Monitoring (`devdoot.register()`)
+
+To automatically catch and log production crashes (`uncaughtException`, `unhandledRejection`, `SIGINT`, etc.) and output structured diagnostics, call `register()` once at the root entry point of your application (e.g. `index.js` or `server.js`).
 
 ```typescript
-import devdoot, { Devdoot } from 'devdoot';
+import devdoot from 'devdoot';
 
-// Configure the global instance
-devdoot.configure({
-  level: 'debug',
-  format: 'json',
-  deepDebugging: false,
-  saveTraces: false
-});
-
-// Create an isolated logger instance with distinct settings
-const customLogger = new Devdoot({
-  level: 'error',
-  format: 'json',
-  outputDir: 'storage/custom-logs'
+// Hook process listeners
+devdoot.register({
+  uncaughtException: true, // Generate diagnosis report and exit on uncaught errors
+  unhandledRejection: true, // Handle unhandled promise rejections
+  beforeExit: true,        // Save summary report upon clean process termination
+  exit: true,              // Save summary report on standard process exit
+  sigint: true,            // Save report on Ctrl+C (SIGINT), then exit
+  sigterm: true,           // Save report on termination signal (SIGTERM), then exit
+  exitOnError: true        // Terminate process when fatal exceptions are caught
 });
 ```
 
-### Environment Variables
-
-Environment variables take precedence and are automatically parsed:
-
-| Variable | Description | Default |
-| :--- | :--- | :--- |
-| `DEVDOOT_ENABLED` | Enable or disable all logging (`true`/`false`). | `true` |
-| `DEVDOOT_LEVEL` / `DEVDOOT_LOG_LEVEL` | Log levels (`trace`, `debug`, `info`, `warn`, `error`). | `info` (or `error` in prod) |
-| `DEVDOOT_FORMAT` / `DEVDOOT_LOG_FORMAT` | Output format (`console`, `json`). | `console` (or `json` in prod) |
-| `DEVDOOT_DEEP_DEBUGGING` | Enable deep debugging mode (`true`/`false`). | `false` |
-| `DEVDOOT_DEEP_DEBUG_GROUPS` | Comma-separated list of group names to show in deep debugging. | All |
-| `DEVDOOT_SAVE_TRACES` / `DEVDOOT_WRITE_TRACES` | Write successful traces as plain-text `.txt` files to `storage/devdoot/traces/` (`true`/`false`). | `false` |
-| `DEVDOOT_IN_PROD` / `NODE_ENV` | Detects production environment. | `false` |
-| `DEVDOOT_OUTPUT_DIR` | Base directory to save traces and crash reports. | `storage/devdoot` |
+> [!NOTE]
+> **Global Deduplication Protection:** `register()` is completely idempotent. If called in multiple places (or in separate dependency installations), it uses a global `Symbol` to register each handler exactly once, preventing duplicate event hooks or memory leaks.
 
 ---
 
