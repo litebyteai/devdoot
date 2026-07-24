@@ -23,13 +23,13 @@ runTraced('ExternalServicesWorkflow', async (workflowTrace) => {
   workflowTrace.info('Starting external API workflows');
 
   try {
-    workflowTrace.info('Fetching posts from mock API');
+    workflowTrace.info('Fetching users from local Express server (requires npm run express to be running)');
     
-    // This call is intercepted and will propagate span/trace headers to jsonplaceholder
-    const response = await client.get('https://jsonplaceholder.typicode.com/posts/1');
+    // This call is intercepted and will propagate span/trace headers to the local service
+    const response = await client.get('http://localhost:3010/api/users');
     
-    workflowTrace.info(`Fetched post successfully. Title: "${response.data.title}"`);
-  } catch (error) {
-    workflowTrace.error(error);
+    workflowTrace.info(`Fetched users successfully. Count: ${response.data.users.length}`);
+  } catch (error: any) {
+    workflowTrace.error(`Failed to fetch from local Express server: ${error.message}. (Did you start it using 'npm run express'?)`);
   }
 });

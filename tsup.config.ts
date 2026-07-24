@@ -6,10 +6,19 @@ export default defineConfig({
   entry: {
     index: 'src/index.ts',
     cli: 'src/cli.ts',
-    plugins: 'src/plugins/index.ts'
+    plugins: 'src/plugins/index.ts',
+    logger: 'src/logger.ts',
+    trace: 'src/trace.ts',
+    reporter: 'src/reporter.ts',
+    diagnostics: 'src/diagnostics.ts',
+    formatter: 'src/formatter.ts',
+    time: 'src/time.ts',
+    caller: 'src/caller.ts',
+    context: 'src/context.ts'
   },
   format: ['cjs', 'esm'],
   dts: true,
+  bundle: false,
   splitting: false,
   sourcemap: true,
   clean: true,

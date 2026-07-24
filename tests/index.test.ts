@@ -74,6 +74,7 @@ describe('Diagnostics', () => {
 
 describe('Crash Reports', () => {
   it('should write reports to disk', () => {
+    globalConfig.update({ saveReports: true });
     const mockReport = {
       id: 'test-uuid-1234',
       timestamp: new Date().toISOString(),
@@ -91,6 +92,7 @@ describe('Crash Reports', () => {
     
     // Cleanup
     fs.unlinkSync(filePath);
+    globalConfig.update({ saveReports: false });
   });
 });
 
@@ -152,7 +154,7 @@ describe('Configuration Options', () => {
     process.env.DEVDOOT_FORMAT = 'json';
     process.env.DEVDOOT_ENABLED = 'false';
 
-    const config = new DevdootConfig();
+    const config = new DevdootConfig({ allowEnv: true });
     
     expect(config.levelName).toBe('warn');
     expect(config.format).toBe('json');
@@ -222,7 +224,7 @@ describe('Configuration Options', () => {
 
   it('should support selective deep debugging group filters via config and env', () => {
     process.env.DEVDOOT_DEEP_DEBUG_GROUPS = 'Auth, Database ';
-    const config = new DevdootConfig();
+    const config = new DevdootConfig({ allowEnv: true });
     expect(config.deepDebugGroups).toEqual(['Auth', 'Database']);
     delete process.env.DEVDOOT_DEEP_DEBUG_GROUPS;
 
@@ -246,7 +248,7 @@ describe('Configuration Options', () => {
 
   it('should support saveTraces configuration and env variable toggling', async () => {
     process.env.DEVDOOT_SAVE_TRACES = 'true';
-    const config = new DevdootConfig();
+    const config = new DevdootConfig({ allowEnv: true });
     expect(config.saveTraces).toBe(true);
     delete process.env.DEVDOOT_SAVE_TRACES;
 
@@ -288,6 +290,7 @@ describe('Global Process Registry', () => {
 
   beforeEach(() => {
     onHandlers = {};
+    globalConfig.update({ saveReports: true });
 
     vi.spyOn(process, 'on').mockImplementation((event: string, handler: any) => {
       if (!onHandlers[event]) {
@@ -304,6 +307,7 @@ describe('Global Process Registry', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    globalConfig.update({ saveReports: false });
     // Clean up the global registered symbol to allow re-registration in other tests
     const key = Symbol.for('devdoot.process.registered');
     delete (globalThis as any)[key];

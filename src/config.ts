@@ -19,6 +19,8 @@ export interface DevdootOptions {
   outputDir?: string;
   deepDebugGroups?: string[];
   saveTraces?: boolean;
+  saveReports?: boolean;
+  allowEnv?: boolean;
 }
 
 export class DevdootConfig {
@@ -32,10 +34,16 @@ export class DevdootConfig {
   outputDir: string;
   deepDebugGroups?: string[];
   saveTraces: boolean;
+  saveReports: boolean;
+  allowEnv: boolean;
 
   constructor(options: DevdootOptions = {}) {
+    this.allowEnv = options.allowEnv ?? false;
+
     const getEnv = (key: string): string | undefined => {
-      return typeof process !== 'undefined' && process.env ? process.env[key] : undefined;
+      if (!this.allowEnv) return undefined;
+      const processObj = typeof process !== 'undefined' ? process : undefined;
+      return processObj && processObj['env'] ? processObj['env'][key] : undefined;
     };
 
     const parseBoolEnv = (val: string | undefined, defaultVal: boolean): boolean => {
@@ -72,9 +80,14 @@ export class DevdootConfig {
 
     const envSaveTraces = getEnv('DEVDOOT_SAVE_TRACES') || getEnv('DEVDOOT_WRITE_TRACES');
     this.saveTraces = options.saveTraces ?? parseBoolEnv(envSaveTraces, false);
+
+    const envSaveReports = getEnv('DEVDOOT_SAVE_REPORTS') || getEnv('DEVDOOT_WRITE_REPORTS');
+    this.saveReports = options.saveReports ?? parseBoolEnv(envSaveReports, false);
   }
 
   update(options: DevdootOptions): void {
+    if (options.allowEnv !== undefined) this.allowEnv = options.allowEnv;
+    if (options.saveReports !== undefined) this.saveReports = options.saveReports;
     if (options.inProd !== undefined) this.inProd = options.inProd;
     if (options.level !== undefined) {
       this.levelName = options.level;

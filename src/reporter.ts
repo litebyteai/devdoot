@@ -45,6 +45,9 @@ export function generateReport(error: Error): CrashReport {
  * Write a report object to disk synchronously (necessary for crash handling).
  */
 export function writeReport(report: CrashReport): string {
+  if (!globalConfig.saveReports) {
+    return '';
+  }
   const dir = path.resolve(globalConfig.outputDir, 'reports');
   fs.mkdirSync(dir, { recursive: true });
   
@@ -112,7 +115,11 @@ type ProcessEventKey = 'uncaughtException' | 'unhandledRejection' | 'beforeExit'
         try {
           const report = generateReport(error);
           const filePath = writeReport(report);
-          process.stderr.write(`\n\x1b[31m\x1b[1m[Devdoot] Uncaught Exception Detected! Crash report written to: ${filePath}\x1b[0m\n`);
+          if (filePath) {
+            process.stderr.write(`\n\x1b[31m\x1b[1m[Devdoot] Uncaught Exception Detected! Crash report written to: ${filePath}\x1b[0m\n`);
+          } else {
+            process.stderr.write(`\n\x1b[31m\x1b[1m[Devdoot] Uncaught Exception Detected!\x1b[0m\n`);
+          }
         } catch (writeErr) {
           process.stderr.write(`\n\x1b[31m[Devdoot] Failed to write crash report: ${writeErr}\x1b[0m\n`);
         }
@@ -133,7 +140,11 @@ type ProcessEventKey = 'uncaughtException' | 'unhandledRejection' | 'beforeExit'
         try {
           const report = generateReport(error);
           const filePath = writeReport(report);
-          process.stderr.write(`\n\x1b[31m\x1b[1m[Devdoot] Unhandled Promise Rejection Detected! Crash report written to: ${filePath}\x1b[0m\n`);
+          if (filePath) {
+            process.stderr.write(`\n\x1b[31m\x1b[1m[Devdoot] Unhandled Promise Rejection Detected! Crash report written to: ${filePath}\x1b[0m\n`);
+          } else {
+            process.stderr.write(`\n\x1b[31m\x1b[1m[Devdoot] Unhandled Promise Rejection Detected!\x1b[0m\n`);
+          }
         } catch (writeErr) {
           process.stderr.write(`\n\x1b[31m[Devdoot] Failed to write crash report: ${writeErr}\x1b[0m\n`);
         }
@@ -153,7 +164,11 @@ type ProcessEventKey = 'uncaughtException' | 'unhandledRejection' | 'beforeExit'
         try {
           const report = generateReport(new Error(`Process beforeExit event triggered with code ${code}`));
           const filePath = writeReport(report);
-          process.stderr.write(`\n\x1b[33m[Devdoot] Process beforeExit event triggered with code ${code}. Report written to: ${filePath}\x1b[0m\n`);
+          if (filePath) {
+            process.stderr.write(`\n\x1b[33m[Devdoot] Process beforeExit event triggered with code ${code}. Report written to: ${filePath}\x1b[0m\n`);
+          } else {
+            process.stderr.write(`\n\x1b[33m[Devdoot] Process beforeExit event triggered with code ${code}\x1b[0m\n`);
+          }
         } catch (writeErr) {
           process.stderr.write(`\n\x1b[31m[Devdoot] Failed to write beforeExit report: ${writeErr}\x1b[0m\n`);
         }
@@ -172,7 +187,11 @@ type ProcessEventKey = 'uncaughtException' | 'unhandledRejection' | 'beforeExit'
         try {
           const report = generateReport(new Error(`Process exited with code ${code}`));
           const filePath = writeReport(report);
-          process.stderr.write(`\n\x1b[32m[Devdoot] Process exited with code: ${code}. Report written to: ${filePath}\x1b[0m\n`);
+          if (filePath) {
+            process.stderr.write(`\n\x1b[32m[Devdoot] Process exited with code: ${code}. Report written to: ${filePath}\x1b[0m\n`);
+          } else {
+            process.stderr.write(`\n\x1b[32m[Devdoot] Process exited with code: ${code}\x1b[0m\n`);
+          }
         } catch (writeErr) {
           process.stderr.write(`\n\x1b[31m[Devdoot] Failed to write exit report: ${writeErr}\x1b[0m\n`);
         }
@@ -191,7 +210,11 @@ type ProcessEventKey = 'uncaughtException' | 'unhandledRejection' | 'beforeExit'
         try {
           const report = generateReport(new Error('Process received SIGINT (Ctrl+C)'));
           const filePath = writeReport(report);
-          process.stderr.write(`\n\x1b[33m[Devdoot] Received SIGINT. Shutdown report written to: ${filePath}\x1b[0m\n`);
+          if (filePath) {
+            process.stderr.write(`\n\x1b[33m[Devdoot] Received SIGINT. Shutdown report written to: ${filePath}\x1b[0m\n`);
+          } else {
+            process.stderr.write(`\n\x1b[33m[Devdoot] Received SIGINT. Terminating...\x1b[0m\n`);
+          }
         } catch (writeErr) {
           process.stderr.write(`\n\x1b[31m[Devdoot] Failed to write shutdown report on SIGINT: ${writeErr}\x1b[0m\n`);
         }
@@ -211,7 +234,11 @@ type ProcessEventKey = 'uncaughtException' | 'unhandledRejection' | 'beforeExit'
         try {
           const report = generateReport(new Error('Process received SIGTERM'));
           const filePath = writeReport(report);
-          process.stderr.write(`\n\x1b[33m[Devdoot] Received SIGTERM. Shutdown report written to: ${filePath}\x1b[0m\n`);
+          if (filePath) {
+            process.stderr.write(`\n\x1b[33m[Devdoot] Received SIGTERM. Shutdown report written to: ${filePath}\x1b[0m\n`);
+          } else {
+            process.stderr.write(`\n\x1b[33m[Devdoot] Received SIGTERM. Terminating...\x1b[0m\n`);
+          }
         } catch (writeErr) {
           process.stderr.write(`\n\x1b[31m[Devdoot] Failed to write shutdown report on SIGTERM: ${writeErr}\x1b[0m\n`);
         }
@@ -233,7 +260,11 @@ type ProcessEventKey = 'uncaughtException' | 'unhandledRejection' | 'beforeExit'
           try {
             const report = generateReport(error);
             const filePath = writeReport(report);
-            process.stderr.write(`\n\x1b[33m[Devdoot] Promise multipleResolves detected! Report written to: ${filePath}\x1b[0m\n`);
+            if (filePath) {
+              process.stderr.write(`\n\x1b[33m[Devdoot] Promise multipleResolves detected! Report written to: ${filePath}\x1b[0m\n`);
+            } else {
+              process.stderr.write(`\n\x1b[33m[Devdoot] Promise multipleResolves detected: type=${type}, value=${String(value)}\x1b[0m\n`);
+            }
           } catch (writeErr) {
             process.stderr.write(`\n\x1b[31m[Devdoot] Failed to write report on multipleResolves: ${writeErr}\x1b[0m\n`);
           }
