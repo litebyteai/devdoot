@@ -45,9 +45,6 @@ export function generateReport(error: Error): CrashReport {
  * Write a report object to disk synchronously (necessary for crash handling).
  */
 export function writeReport(report: CrashReport): string {
-  if (!globalConfig.saveReports) {
-    return '';
-  }
   const dir = path.resolve(globalConfig.outputDir, 'reports');
   fs.mkdirSync(dir, { recursive: true });
   

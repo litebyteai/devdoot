@@ -74,7 +74,6 @@ describe('Diagnostics', () => {
 
 describe('Crash Reports', () => {
   it('should write reports to disk', () => {
-    globalConfig.update({ saveReports: true });
     const mockReport = {
       id: 'test-uuid-1234',
       timestamp: new Date().toISOString(),
@@ -92,7 +91,6 @@ describe('Crash Reports', () => {
     
     // Cleanup
     fs.unlinkSync(filePath);
-    globalConfig.update({ saveReports: false });
   });
 });
 
@@ -290,7 +288,6 @@ describe('Global Process Registry', () => {
 
   beforeEach(() => {
     onHandlers = {};
-    globalConfig.update({ saveReports: true });
 
     vi.spyOn(process, 'on').mockImplementation((event: string, handler: any) => {
       if (!onHandlers[event]) {
@@ -307,7 +304,6 @@ describe('Global Process Registry', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
-    globalConfig.update({ saveReports: false });
     // Clean up the global registered symbol to allow re-registration in other tests
     const key = Symbol.for('devdoot.process.registered');
     delete (globalThis as any)[key];
