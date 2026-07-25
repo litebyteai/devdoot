@@ -5,6 +5,12 @@
 [![NPM Version](https://img.shields.io/npm/v/devdoot.svg?style=flat-square)](https://www.npmjs.com/package/devdoot)
 [![License](https://img.shields.io/npm/l/devdoot.svg?style=flat-square)](https://github.com/litebyteai/devdoot/blob/main/LICENSE)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/litebyteai/devdoot/test.yml?branch=main)](https://github.com/litebyteai/devdoot/actions)
+
+---
+
+📖 **Read in other languages:** 
+- [🇮🇳 Hinglish (Hindi + English)](file:///d:/Projects/nodejs/automation/devdoot/README-hinglish.md)
+
 ---
 
 

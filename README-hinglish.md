@@ -4,6 +4,11 @@ High-performance developer diagnostics, execution tracing, aur global crash repo
 
 ---
 
+📖 **Dusri languages me padhein:** 
+- [🇬🇧 English](file:///d:/Projects/nodejs/automation/devdoot/README.md)
+
+---
+
 ## Devdoot Kyun? 🤔
 
 Hum sab development aur debugging ke waqt `console.log()`, `console.warn()`, aur `console.error()` use karte hain. Chote projects me ye theek chalta hai, par jaise hi project bada hota hai, hum ye bhool jaate hain ki:
