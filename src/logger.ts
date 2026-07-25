@@ -42,10 +42,13 @@ export class DevdootLogger {
     this.isNoop = isNoop;
   }
 
-  group(name: string): this {
+  group(name: string): DevdootLogger {
     if (this.isNoop) return this;
     this.currentGroup = name;
-    return this;
+    
+    const groupedLogger = new DevdootLogger(this.config);
+    groupedLogger.currentGroup = name;
+    return groupedLogger;
   }
 
   create(options?: DevdootOptions): DevdootLogger {

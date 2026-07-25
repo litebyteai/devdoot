@@ -15,14 +15,20 @@ devdoot.configure({
   saveTraces: true // Writes completed traces to storage/devdoot/traces/*.txt
 });
 
-console.log('=== 1. Non-Invasive Grouping Demo ===');
+console.log('=== 1a. Non-Invasive Grouping Demo ===');
 devdoot.group('Authentication');
 devdoot.info('Verifying user credentials...');
 devdoot.info('User session established successfully.');
 
-devdoot.group('PaymentGateway');
-devdoot.warn('Payment API returned high latency (820ms)');
-devdoot.info('Payment succeeded. Receipt generated.');
+console.log('\n=== 1b. Scoped Group Logger Demo ===');
+// Returns a new isolated logger instance bound to the group name!
+const dbLogger = devdoot.group('Database');
+const paymentLogger = devdoot.group('PaymentGateway');
+
+dbLogger.info('Verifying connection pool...');
+paymentLogger.warn('Payment API returned high latency (820ms)');
+dbLogger.info('Database query executed successfully.');
+paymentLogger.info('Payment succeeded. Receipt generated.');
 
 console.log('\n=== 2. Hierarchical Tracing timing Demo ===');
 runTraced('CheckoutProcess', (checkoutTrace) => {

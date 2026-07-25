@@ -203,8 +203,20 @@ describe('Configuration Options', () => {
     devdoot.group('GroupB').warn('Test Warning');
     
     expect(consoleSpy).toHaveBeenCalledTimes(2);
-    devdoot.group('');
     consoleSpy.mockRestore();
+    devdoot.group('');
+  });
+
+  it('should return a new isolated logger instance from group()', () => {
+    const dblog = devdoot.group('Database');
+    const authlog = devdoot.group('Auth');
+    
+    expect(dblog).not.toBe(devdoot);
+    expect(authlog).not.toBe(devdoot);
+    expect(dblog).not.toBe(authlog);
+    
+    expect(dblog.currentGroup).toBe('Database');
+    expect(authlog.currentGroup).toBe('Auth');
   });
 
   it('should support custom instances and isolation via Devdoot class and create()', () => {
@@ -235,7 +247,7 @@ describe('Configuration Options', () => {
     expect(consoleSpy).not.toHaveBeenCalled();
 
     const resultDb = devdoot.group('Database').debug();
-    expect(resultDb).toBe(devdoot);
+    expect(resultDb).not.toBe(NOOP_LOGGER);
     resultDb.log('Database debug message');
     expect(consoleSpy).toHaveBeenCalled();
 
