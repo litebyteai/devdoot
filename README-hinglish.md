@@ -5,7 +5,7 @@ High-performance developer diagnostics, execution tracing, aur global crash repo
 ---
 
 📖 **Dusri languages me padhein:** 
-- [🇬🇧 English](file:///d:/Projects/nodejs/automation/devdoot/README.md)
+- [🇬🇧 English](./README.md)
 
 ---
 

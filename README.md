@@ -9,7 +9,7 @@
 ---
 
 📖 **Read in other languages:** 
-- [🇮🇳 Hinglish (Hindi + English)](file:///d:/Projects/nodejs/automation/devdoot/README-hinglish.md)
+- [🇮🇳 Hinglish (Hindi + English)](./README-hinglish.md)
 
 ---
 
