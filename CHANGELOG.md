@@ -2,7 +2,7 @@
 
 All notable changes to the `devdoot` project will be documented in this file.
 
-## [0.0.3] - 2026-07-26
+## [0.0.4] - 2026-07-26
 
 ### Added
 - **Scoped Group Logger**: `devdoot.group('Name')` now returns a new isolated `DevdootLogger` instance bound to the specified group name, enabling group-scoped logging without reference collisions. Chaining and standalone calls remain fully backward compatible.

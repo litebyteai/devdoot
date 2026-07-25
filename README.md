@@ -305,7 +305,9 @@ import devdoot, { runTraced } from 'devdoot';
 devdoot.info('Hello from devdoot!');
 
 // Use groups to filter/organize logs dynamically
-devdoot.group('BillingService').info('Invoice #1024 paid.');
+// Calling group() returns a new isolated logger instance bound to that group!
+const billingLogger = devdoot.group('BillingService');
+billingLogger.info('Invoice #1024 paid.');
 
 // Create traces to track execution hierarchy and latencies
 runTraced('MainJob', (trace) => {
