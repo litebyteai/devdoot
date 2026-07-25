@@ -1,14 +1,67 @@
-# 🚀 Devdoot
+# 🚀 Devdoot — The Developer's Doot
 
-### *The Intelligent, High-Performance Developer Diagnostics & Tracing Engine for Node.js*
+### *High-Performance Developer Logger with AI Diagnostics, Tracing & Notification for Node.js.*
 
 [![NPM Version](https://img.shields.io/npm/v/devdoot.svg?style=flat-square)](https://www.npmjs.com/package/devdoot)
 [![License](https://img.shields.io/npm/l/devdoot.svg?style=flat-square)](https://github.com/litebyteai/devdoot/blob/main/LICENSE)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/litebyteai/devdoot/test.yml?branch=main)](https://github.com/litebyteai/devdoot/actions)
+---
 
-**Devdoot** is a lightweight, zero-overhead developer diagnostics and distributed tracing platform for Node.js applications. It isn't just another logger—it is a comprehensive runtime observer designed to help you instantly understand *what happened*, *when it happened*, *where it happened*, and *why it failed*, without polluting your codebase with manual logging statements.
+
+## ⚡ See Devdoot in Action
+Replace your existing `console.log()` with Devdoot and instantly get structured logs, source locations, execution timing, groups, and optional deep debugging.
+
+```ts id="t86jhd"
+import devdoot from 'devdoot';
+
+devdoot.log('Application started');
+
+const database = devdoot.group('Database');
+const apiResponse = devdoot.group('ApiResponse');
+
+database.log('Fetching users...');
+database.info('100 records fetched', { count: 100 });
+
+apiResponse.success('GET /api/users', { status: 200 });
+
+// Only shown when deep debugging is enabled
+database.debug().warn('Fetched user data', users);
+
+database.error('Database connection failed', error);
+```
+
+Output:
+
+```text id="e5jrku"
+[LOG] Application started [src/index.ts:8:1] [+0ms]
+
+[LOG] [Database] Fetching users... [src/database.ts:12:5] [+2ms]
+
+[INFO] [Database] 100 records fetched { count: 100 } [src/database.ts:18:5] [+5ms]
+
+[SUCCESS] [ApiResponse] GET /api/users { status: 200 } [src/api.ts:34:9] [+8ms]
+
+[WARN] [Database] Fetched user data [..json] [src/database.ts:22:5] [+10ms]
+
+[ERROR] [Database] Database connection failed Error: Connection refused [src/database.ts:52:5] [+15ms]
+```
+
+That's it.
+
+No configuration.
+
+No setup.
+
+No boilerplate.
+
+Replace `console.log()` with Devdoot and get structured logs, execution time, clickable source locations, groups, and optional deep debugging.
+
 
 ---
+
+
+Devdoot brings **developer-friendly logging, execution tracing, diagnostics, runtime monitoring, report generation, and AI-assisted analysis** together in a single lightweight library. It helps developers understand **what happened, where it happened, when it happened, and why it failed**—while keeping runtime overhead as low as possible.
+
 
 ## 🌟 Key Features
 
@@ -24,19 +77,202 @@
 
 ---
 
-## ⚖️ Winston vs. Devdoot
+## Why Devdoot?
 
-If you are wondering how `devdoot` compares to classic Node.js logging libraries like Winston, here is a quick breakdown of why you would choose `devdoot`:
+**Devdoot** is the **Developer's Doot**—a high-performance developer logger with intelligent diagnostics and tracing for Node.js.
 
-| Feature | Winston (winston) | Devdoot |
-| :--- | :--- | :--- |
-| **Main Focus** | Multi-transport flat logging (Files, Database, Console). | Developer diagnostics, nested tracing, and crash reporting. |
-| **Hierarchical Tracing** | ❌ **No.** Only logs flat, independent lines. | 🌲 **Yes.** Supports nested spans (`runTraced`) showing parent-child relationships. |
-| **Context Propagation** | ❌ **No.** Requires manual parameter passing. | 🔗 **Automatic.** Uses `AsyncLocalStorage` to auto-propagate groups/traces. |
-| **Production Overhead** | ⚠️ **Medium.** Logger calls execute formatting and transport layers. | ⚡ **Near-Zero.** Bypasses calls entirely via a frozen `NOOP` instance when disabled. |
-| **Global Crash Handling** | ⚠️ **Basic.** Hard to configure correctly across multiple dependencies. | 🚨 **Advanced.** Deduplicated globally via process-level `Symbol` tracking. |
-| **Interactive Viewer** | ❌ **No.** Requires setting up external ELK stacks or APMs. | 💻 **Yes.** Open `.txt` trace logs in a beautiful terminal viewer via CLI. |
-| **Modern Integrations** | ❌ **No.** Requires writing custom wrapper libraries. | 🔌 **Yes.** Drop-in plugins for **Express**, **Axios**, and **Playwright**. |
+Most Node.js developers use `console.log()`, `console.warn()`, and `console.error()` while developing and debugging. It works well for small projects, but as projects grow, developers often forget **why a log was added**, **where it was added**, or **whether it is still needed**. Before deploying to production, they have to search for and remove or comment out debug logs. When another bug appears, they repeat the same process by adding temporary logs again.
+
+Devdoot was built to solve these common development problems. Instead of simple console logs, it provides developer-friendly logs with rich information, including:
+
+* 📍 Exact source location (file, line, and column) with one-click **Go to Source** support in supported terminals and IDEs.
+* ⏱️ Execution time for every log, trace, function, or module to quickly identify slow code.
+* 🏷️ Log groups, tracing, and deep debugging to organize large applications.
+* ⚙️ Enable or disable debugging with a single configuration change—no need to remove or comment out logs.
+* 📄 Save logs and traces to files for later debugging and sharing.
+* 📊 Generate detailed execution reports with errors, warnings, execution time, CPU usage, memory usage, process information, and runtime statistics.
+* 📈 Compare reports from different runs to understand performance changes, new warnings, regressions, and optimizations.
+* 🤖 AI-powered analysis to detect possible bugs, explain errors, recommend optimizations, and identify future risks.
+* 🚨 Monitor production applications by automatically capturing unhandled exceptions, promise rejections, warnings, and other runtime events, then store reports and send notifications through email, webhooks, or other integrations.
+
+I started building Devdoot more than **2 years ago** because I was spending too much time debugging my own Node.js projects. At first, it was only for my personal use, but after seeing how much time it saved, I decided to make it open source so every Node.js developer could benefit from it.
+
+Devdoot is still growing. I have many more features planned, and I'm committed to continuously improving it by adding new capabilities, fixing issues, and making it one of the most useful developer tools for the Node.js ecosystem.
+
+I recommend trying Devdoot once. I hope it helps you debug faster, better understand your application, and spend more time building features instead of chasing bugs.
+ 
+
+## ✨ Why Developers Use Devdoot
+
+### 1. Never Lose the Purpose of Your Logs *(🟢 Available)*
+
+Most developers use `console.log()`, `console.warn()`, or `console.error()` while debugging.
+
+After a few weeks or months, they often forget:
+
+* Why was this log added?
+* Is it still needed?
+* Can I remove it?
+* Did I leave debug logs in production?
+
+In large projects, finding and cleaning old logs takes a lot of time.
+
+Devdoot gives every log more useful information like the file name, line number, execution time, log level, module name, and trace details. In supported terminals and IDEs, you can click the file path to open the exact source code.
+
+You can also turn deep debugging on or off with one configuration change instead of removing or commenting logs.
+
+---
+
+### 2. Know Which Code Takes Time *(🟢 Available)*
+
+Sometimes an application feels slow, but it's hard to know which function or module is causing it.
+
+Devdoot automatically shows how much time each log or operation takes.
+
+Example:
+
+```text
+[INFO] [DatabaseFetch] Fetched 100 rows successfully [D:\Projects\nodejs\my-project\examples\demo.ts:67:13] [+5ms]
+```
+
+This helps you quickly find:
+
+* Slow functions
+* Slow modules
+* Performance bottlenecks
+* Whether your optimization really helped
+
+No need to add timers everywhere.
+
+---
+
+### 3. Save Logs for Later *(🟢 Available)*
+
+Terminal logs disappear after your application stops.
+
+If you need to debug the same problem later, those logs are gone.
+
+Devdoot can save logs and traces to files, so you can:
+
+* Check old executions
+* Investigate production issues
+* Compare old logs
+* Share logs with teammates
+
+---
+
+### 4. Show Logs Only for the Module You're Working On *(🟢 Available)*
+
+Large applications can print thousands of logs.
+
+Most of the time, you're working on only one module like `Database`, `Auth`, or `Payment`.
+
+Devdoot lets you organize logs by **groups (modules)**.
+
+By default, all logs work normally. If you're debugging only one module, you can show deep debugging logs only for that module.
+
+```env
+DEVDOOT_DEEP_DEBUG_GROUPS=Database
+```
+
+Now you'll only see deep debugging logs from the **Database** module.
+
+Your terminal stays clean and you can focus on the code you're working on.
+
+---
+
+### 5. Detect Hidden Production Problems *(🟡 Partially Available)*
+
+Some production errors happen silently.
+
+For example:
+
+* Uncaught Exceptions
+* Unhandled Promise Rejections
+* Process Warnings
+* Process Exit Events
+
+Developers may never know these problems happened.
+
+Devdoot can automatically capture these events and save detailed reports to help you find the root cause.
+
+Notifications like Email, Webhooks, Slack, and Discord are coming soon.
+
+---
+
+### 6. Generate Runtime Reports *(🚧 Under Development)*
+
+Reading thousands of log lines is difficult.
+
+Devdoot will generate simple reports that show:
+
+* Errors
+* Warnings
+* Execution time
+* CPU usage
+* Memory usage
+* Runtime information
+* Module statistics
+
+Instead of reading every log, you'll get a quick summary of what happened.
+
+---
+
+### 7. Compare Multiple Runs *(🚧 Under Development)*
+
+Want to know if your latest update improved the application?
+
+Devdoot will compare two or more reports and show things like:
+
+* Performance changes
+* Memory changes
+* New warnings
+* New errors
+* Slower modules
+
+This will make optimization much easier.
+
+---
+
+### 8. AI-Powered Log Analysis *(🚧 Under Development)*
+
+Reading thousands of logs takes time.
+
+Devdoot will use AI to:
+
+* Find bugs
+* Explain errors
+* Suggest fixes
+* Find slow code
+* Recommend optimizations
+* Summarize reports
+* Predict possible future issues
+
+This will help developers understand problems much faster.
+
+---
+
+### 🚀 More Features Are Coming
+
+Devdoot started as my personal debugging tool.
+
+I'm continuously adding new features based on real development problems.
+
+The goal is simple:
+
+**Spend less time debugging and more time building.**
+
+
+
+## 📖 Documentation
+
+The documentation is still a work in progress, but it already covers everything you need to get started with Devdoot.
+
+As new features are added, we'll continue improving the documentation with better explanations, examples, and guides. We also try to keep the documentation structure and API usage consistent, so you won't need to relearn everything when new features are released.
+
+Our goal is to make Devdoot easy to learn, easy to use, and easy to maintain.
+
+
 
 ---
 
@@ -54,29 +290,6 @@ pnpm add devdoot
 
 ---
 
-## 📂 Examples Sub-Projects
-
-For fully-configured, runnable projects showing how to integrate `devdoot` in real-world scenarios, check out the [uses-example](file:///d:/Projects/nodejs/automation/devdoot/uses-example) folder. It contains two isolated sub-folders:
-
-### 1. [JavaScript Node.js Example](file:///d:/Projects/nodejs/automation/devdoot/uses-example/node-js)
-Contains pure ES Module JavaScript examples:
-- **`demo.js`**: Logging levels, groups, nested traces, and crash reporting.
-- **`express-demo.js`**: HTTP middleware tracing.
-
-### 2. [TypeScript Example](file:///d:/Projects/nodejs/automation/devdoot/uses-example/typescript)
-Contains standard TypeScript examples utilizing type definitions and a compiler config (`tsconfig.json`):
-- **`demo.ts`**: Logging levels, nested traces, and crash reporting.
-- **`express-demo.ts`**: HTTP middleware tracing.
-- **`axios-demo.ts`**: Cross-network trace header propagation.
-
-To run any of the examples, navigate to the folder, install the NPM package, and start the demo:
-```bash
-cd uses-example/node-js # or cd uses-example/typescript
-npm install
-npm run demo
-```
-
----
 
 ## 🚀 Quick Start & Integration Guides
 
@@ -223,63 +436,111 @@ await playwrightTrace('SubmitLoginForm', async (trace) => {
   trace.info('Login submitted');
 });
 ```
-
 ---
 
-## 💻 Command Line Interface (CLI)
 
-`devdoot` includes a robust CLI to interact with diagnostic outputs and runtime performance.
+
+## 📂 Examples Sub-Projects
+
+For fully-configured, runnable projects showing how to integrate `devdoot` in real-world scenarios, check out the [uses-example](file:///d:/Projects/nodejs/automation/devdoot/uses-example) folder. It contains two isolated sub-folders:
+
+### 1. [JavaScript Node.js Example](file:///d:/Projects/nodejs/automation/devdoot/uses-example/node-js)
+Contains pure ES Module JavaScript examples:
+- **`demo.js`**: Logging levels, groups, nested traces, and crash reporting.
+- **`express-demo.js`**: HTTP middleware tracing.
+
+### 2. [TypeScript Example](file:///d:/Projects/nodejs/automation/devdoot/uses-example/typescript)
+Contains standard TypeScript examples utilizing type definitions and a compiler config (`tsconfig.json`):
+- **`demo.ts`**: Logging levels, nested traces, and crash reporting.
+- **`express-demo.ts`**: HTTP middleware tracing.
+- **`axios-demo.ts`**: Cross-network trace header propagation.
+
+To run any of the examples, navigate to the folder, install the NPM package, and start the demo:
+```bash
+cd uses-example/node-js # or cd uses-example/typescript
+npm install
+npm run demo
+```
+
+---
+## 💻 Command Line Interface (CLI) *(🚧 Beta)*
+
+The current Devdoot CLI is in **beta**. It works and is ready to use, but we know it isn't the CLI experience we ultimately want.
+
+The current version was built as the **first step** toward a much more modern, interactive, and developer-friendly CLI. We already have many improvements and new commands planned, but they will take time to build.
 
 ```bash
 # Verify system health and configuration
 npx devdoot doctor
 
-# List and summarize generated crash reports in the storage directory
+# List generated crash reports
 npx devdoot report
 
-# Scan saved trace files and list all unique discovered group names
+# List all discovered log groups
 npx devdoot groups
 
-# Launch the interactive Web Viewer to inspect a specific trace or crash report
+# Open a saved report or trace
 npx devdoot open storage/devdoot/reports/report-20260722-233008-466.txt
 ```
 
----
+## 🌐 Web & API Report Panel *(🚧 Planned Add-on)*
 
-## 📂 Architecture
+The Web & API Report Panel is **not available yet**.
 
-For the internal architectural details of context propagation, caller resolution, and file structures, see:
-*   [src/config.ts](file:///D:/Projects/nodejs/automation/devdoot/src/config.ts): Handles options merging, default values, and environment variable parsing.
-*   [src/logger.ts](file:///D:/Projects/nodejs/automation/devdoot/src/logger.ts): Implements log formatters, the high-performance `NOOP_LOGGER`, and the core `DevdootLogger` class (aliased to `Devdoot`).
-*   [src/trace.ts](file:///D:/Projects/nodejs/automation/devdoot/src/trace.ts): Manages trace node trees, durations, and serialization to JSON.
-*   [src/caller.ts](file:///D:/Projects/nodejs/automation/devdoot/src/caller.ts): Leverages stack traces to capture caller files and lines efficiently.
+It is planned as an **optional add-on** for Devdoot, not a required part of the library. The core Devdoot package will remain lightweight and work independently without any web services.
 
-### System Diagnostics & Lifecycle Flow
+In the future, developers will be able to decide whether they want to use the Web & API Report Panel or continue using Devdoot as a standalone library.
 
-```text
-Application Starts
-        │
-        ▼
-   Trace Created
-        │
-        ▼
-   Context Created (AsyncLocalStorage)
-        │
-        ▼
-   Operation Starts
-        │
-        ├──> Logs Recorded (with accurate File:Line and +ms delta)
-        └──> Deep Debugging filter check
-        │
-        ▼
-   Operation Ends (Calculates duration)
-        │
-        ▼
-   Trace Completed (Saves plain text .txt if `saveTraces` is enabled)
-        │
-        ▼
-   [Optional] Crash Report (auto-generated on uncaught exceptions/rejections)
-```
+The planned add-on will provide features such as:
+
+* Modern web-based report viewer
+* Report comparison
+* AI-powered log analysis
+* Live log and trace viewer
+* Search and filtering
+* Performance analytics
+* Team collaboration
+* Remote monitoring
+* REST APIs for automation and integrations
+
+Our goal is to keep the core library simple, fast, and lightweight while offering a powerful optional platform for developers who need advanced reporting and observability features.
+
+**Use only what you need.** If the core library is enough for your project, you never need to install or run the Web & API Report Panel.
+
+
+## ⚡ Built to Stay Fast & Simple
+
+One of the main goals of Devdoot is to keep the **core library as fast, lightweight, and simple as possible**.
+
+We don't want the core package to become large or complex by including features that many developers may never use.
+
+Instead, Devdoot is designed to support **optional add-ons**.
+
+In the future, we'll release many add-ons to solve more advanced and complex development problems, such as AI analysis, web dashboards, remote monitoring, team collaboration, cloud reporting, and other powerful tools.
+
+You only install the add-ons you need for your project. If you don't need a feature, you don't have to install it.
+
+This keeps the core library small, fast, and stable for everyone.
+
+We are committed to keeping the core API backward compatible. New features will mostly be added through optional add-ons, so upgrading Devdoot should not require changes to your existing project or break your current integration.
+
+
+
+## ❤️ Open Source First
+
+Devdoot started as a small tool for our own Node.js projects. We built it because we were spending too much time debugging, understanding old code, and solving the same development problems again and again.
+
+Today, Devdoot is used in our own projects every day, and we'll continue improving it because it helps us build better software. Every new feature starts by solving a real problem we face ourselves before it becomes part of Devdoot.
+
+Devdoot is being built by **Litebyte Innovations**, founded by **Ranjeet Kisaan**, an innovation startup based in **Bihar, India**.
+
+Our goal is simple:
+
+> **Build modern developer tools that solve real-world development problems while staying fast, lightweight, and open for everyone.**
+
+We believe the **core library** should always remain lightweight, fast, and easy to use. As Devdoot grows, many advanced features will be released as **optional add-ons**, so you only install what your project actually needs. This keeps the core stable without affecting existing projects.
+
+Some future add-ons may integrate with AI models or third-party services. When that time comes, developers will be free to choose how they use them—for example, with a local AI model or their own API keys. The core library will remain independent.
 
 ---
 
@@ -308,43 +569,123 @@ npx vitest run tests/benchmark.test.ts
 
 ---
 
-## 🎯 The Vision: Observability for the AI Era
+### Our Open Source Promise
 
-Beyond being a lightweight, low-overhead Node.js library, `devdoot` is the foundation of a **broader open-source ecosystem** designed for modern AI-assisted engineering teams. We are actively developing a unified self-hosted platform written in Node.js to provide:
+* ✅ Open Source First
+* ✅ Free Core Library
+* ✅ Community Driven
+* ✅ Developer First
+* ✅ Lightweight & Fast
+* ✅ Optional Add-ons
+* ✅ Built to Solve Real Development Problems
 
-*   **Deep Observability for AI Systems**: A single dashboard to deeply track complex nested execution states, agent decisions, and hidden runtime errors in real-time.
-*   **AI-Routed Issue Resolution**: Leveraging LLM intelligence to automatically analyze logs, determine which developer or team agent has the best defined "AI Skills" for a specific bug, and auto-route/create resolved issues/tickets accordingly.
-*   **Agentic Framework Compatibility**: Native integrations with **OpenClaw** and other leading LLM agent frameworks to capture step-by-step thinking, tool usage, and prompt latencies.
-*   **High Performance & Ultra-Low Footprint**: Standardized to consume minimal CPU and memory resources, keeping diagnostic overhead practically non-existent.
+Although Devdoot was started by us, **we don't consider it "our project" anymore.**
 
-Our ultimate goal is to build the most helpful, performant logging, diagnostics, and analytics ecosystem for the next generation of software engineers and AI developers.
+It belongs to the open-source community.
+
+Our responsibility is to maintain it, improve it, review contributions, and guide its direction. But its real strength comes from the developers who use it, report bugs, suggest ideas, improve the documentation, and contribute code.
+
+In other words, **we are the maintainers—but you are the owners of the community.**
+
+Whether you contribute code, report an issue, suggest a feature, improve the documentation, or simply use Devdoot in your projects, you're helping shape its future.
+
+Thank you for being part of this journey.
+
+**Built by developers, with the community, for the community. ❤️**
+
 
 ---
 
-## 🗺️ Roadmap & Upcoming Features
 
-`devdoot` is actively maintained and evolved. We are planning and adding new features day by day:
 
-*   **🚨 Real-Time Production Crash Alerts**: Instant integration handlers to dispatch push alerts (via Webhooks, Slack, Discord, or Email) as soon as an `uncaughtException` or `unhandledRejection` is caught in production.
-*   **🤖 AI-Powered Crash Diagnostics & Analytics**: Automatically process telemetry logs and error traces with local or remote AI models to pinpoint root causes, explain runtime contexts, and generate recommended fixes.
-*   **🎫 Automated Issue & Ticket Creation**: Autogenerate bug issues and support tickets directly in your project management tools (**GitHub Issues**, **GitLab**, **Jira**, **Linear**) using configured APIs/webhooks whenever a fatal error is written.
-*   **📺 Live CLI Log Tailer (`devdoot tail`)**: A terminal-based real-time log-streaming tailer with interactive key navigations, level filtering, and expandable nested tree views directly in the shell.
-*   **📡 WebSockets/HTTP Telemetry Streaming**: Stream local `.txt` traces and crash reports dynamically to a remote central logging server or Web UI dashboard.
-*   **🔌 Expanded ORM & Database Wrappers**: Out-of-the-box drop-in tracing plugins for popular database clients: **Prisma**, **Mongoose/MongoDB**, **redis**, and **pg** (PostgreSQL) to automatically capture SQL query performance, payload details, and error states.
-*   **🌐 OpenTelemetry & W3C Compliance**: Exporters to format and send traces into standard collector formats (Jaeger, Zipkin, Honeycomb) so `devdoot` can plug into any existing enterprise observability pipeline.
-*   **🧬 CPU/Memory Profile Dumps**: Dynamically attach a 5-second CPU Flamegraph or memory heap snapshot to crash reports to easily identify infinite loops or memory leaks on crash.
-*   **🧵 Multi-Thread Propagation**: Fully support trace context propagation across Node.js `Worker Threads` and child processes.
+
+## 🎯 Our Vision *(Long-Term)*
+
+Devdoot started as a simple debugging library, but our long-term vision is much bigger.
+
+We want to build an open-source ecosystem that helps developers understand, debug, monitor, and improve their applications more easily.
+
+These ideas are **not promises or release commitments**. They are part of our long-term vision. Since Devdoot is developed in our free time, progress depends on available time and community contributions.
+
+Some ideas we're exploring include:
+
+* 🤖 AI-powered log and report analysis
+* 📊 Modern web-based report dashboard
+* 🔍 Advanced tracing and observability
+* 🎫 Automatic issue and bug report generation
+* 🚨 Production monitoring and smart alerts
+* 🔌 More integrations with Node.js libraries and frameworks
+* 🌐 OpenTelemetry compatibility
+* 📡 Remote log and trace collection
+* 🧠 AI-assisted debugging and optimization
+* 👥 Team collaboration features
+
+Some of these ideas may change, be replaced, or never be implemented. As the project grows, we'll prioritize features based on community feedback and real-world developer needs.
+
+Our goal isn't to build the biggest logging library—it's to build one of the most helpful developer tools for Node.js.
+
+---
+
+## 🗺️ Roadmap
+
+The roadmap is a list of features we're interested in building.
+
+There is **no fixed timeline**. Features will be developed when we have time, when they're needed in our own projects, or when the open-source community contributes to them.
+
+Current roadmap ideas include:
+
+* 🚨 Real-time production crash alerts
+* 🤖 AI-powered diagnostics
+* 🎫 Automatic issue creation
+* 📺 Modern interactive CLI
+* 🌐 Web & API Report Panel
+* 📡 Remote monitoring
+* 🔌 More framework and database integrations
+* 📊 Performance analytics
+* 🧵 Worker Thread and multi-process tracing
+* 🧠 AI-powered optimization suggestions
+
+If you're interested in any of these features, we'd love your help.
 
 ---
 
 ## 🤝 Contributing
 
-We are building a community around next-generation developer diagnostics and observability. If you want to contribute, **you are most welcome!** 
+Devdoot is an open-source community project, and every contribution matters.
 
-Whether it's writing new plugin integrations, optimizing trace collection performance, adding viewer enhancements, or correcting documentation, your pull requests and issues are highly appreciated. Feel free to open a PR or start a discussion!
+You can help by:
 
----
+* 🐛 Reporting bugs
+* 💡 Suggesting new features
+* 📝 Improving documentation
+* 🔧 Fixing bugs
+* ✨ Building new features
+* 🔌 Creating integrations and add-ons
+* 💬 Joining discussions and sharing feedback
+
+Even if you don't write code, your feedback helps make Devdoot better.
+
+Devdoot is developed in our free time, so community contributions can make a huge difference. If you'd like to help shape the future of the project, we'd love to have you involved.
+
+**Let's build something amazing together. ❤️**
+
 
 ## 📄 License
 
-ISC License. Copyright (c) 2026.
+Devdoot is licensed under the **MIT License**.
+
+You are free to use, modify, distribute, and contribute to the project under the terms of the MIT License.
+
+Our goal is to build Devdoot as an **open-source, community-driven project**. Whether you use it in personal projects, commercial applications, or contribute improvements, you're always welcome.
+
+If you find Devdoot useful, please consider:
+
+* ⭐ Starring the project on GitHub
+* 🐛 Reporting bugs
+* 💡 Suggesting new ideas
+* 🔧 Contributing code or documentation
+* ❤️ Sharing it with other developers
+
+Every contribution, no matter how small, helps make Devdoot better for the entire community.
+
+**Copyright © 2026 Litebyte Innovations. All rights reserved under the MIT License.**
