@@ -337,7 +337,7 @@ devdoot.configure({
   saveTraces: true // Writes completed traces to storage/devdoot/traces/*.txt
 });
 
-// 2. Register process-level event monitoring
+// 2. Start global process tracking
 // Saves detailed reports to storage/devdoot/reports/ on exit, SIGINT, or crash.
 devdoot.startGlobalTracking();
 ```

@@ -1,6 +1,6 @@
 import devdoot, { runTraced } from 'devdoot';
 
-// 1. Register the global crash/exit reporter
+// 1. Start global process tracking
 // We configure exitOnError to false so this demo process doesn't shut down on test exceptions.
 devdoot.startGlobalTracking({
   exitOnError: false
