@@ -2,7 +2,7 @@ import devdoot, { runTraced, register, globalConfig, Devdoot } from '../src/inde
 
 // 1. Initialize global process event & error handlers (captures uncaught exceptions, unhandled rejections, signals, etc.)
 // We set `exitOnError: false` for this demo so it does not terminate on test errors.
-devdoot.register({
+devdoot.startGlobalTracking({
   exitOnError: false
 });
 

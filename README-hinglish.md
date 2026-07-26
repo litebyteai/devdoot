@@ -69,7 +69,7 @@ devdoot.configure({
 
 // 2. Global process listeners hook karein
 // Uncaught Exceptions aur SIGINT/Exits par reports save karega
-devdoot.register();
+devdoot.startGlobalTracking();
 ```
 
 ### 3️⃣ Level 3: Deep Debugging & Secure Env Scanning
@@ -110,14 +110,14 @@ Devdoot ko programmatically configure kiya jaa sakta hai, ya environment variabl
 
 ---
 
-## 🚨 Process Exit & Crash Monitoring (`devdoot.register()`)
+## 🚨 Process Exit & Crash Monitoring (`devdoot.startGlobalTracking()`)
 
 Unhandled exceptions aur SIGINT (Ctrl+C) jaise events ko automatically handle aur log karne ke liye apne application ke entry point (e.g. `index.js` ya `server.js`) me isse ek baar call karein:
 
 ```typescript
 import devdoot from 'devdoot';
 
-devdoot.register({
+devdoot.startGlobalTracking({
   uncaughtException: true, // Fatal errors par report save karega aur exit karega
   unhandledRejection: true, // Promises ke unhandled rejections catch karega
   beforeExit: true,        // Application cleanly exit hone par report save karega
@@ -129,4 +129,4 @@ devdoot.register({
 ```
 
 > [!NOTE]
-> **Deduplication Protection:** `register()` fully idempotent hai. Agar multiple sub-dependencies me alag-alag calls bhi ho jati hain, tab bhi global `Symbol` protection se har event handler sirf **ek hi baar** register hoga, preventing duplicate hooks.
+> **Deduplication Protection:** `startGlobalTracking()` fully idempotent hai. Agar multiple sub-dependencies me alag-alag calls bhi ho jati hain, tab bhi global `Symbol` protection se har event handler sirf **ek hi baar** register hoga, preventing duplicate hooks.

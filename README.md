@@ -339,7 +339,7 @@ devdoot.configure({
 
 // 2. Register process-level event monitoring
 // Saves detailed reports to storage/devdoot/reports/ on exit, SIGINT, or crash.
-devdoot.register();
+devdoot.startGlobalTracking();
 ```
 
 ### 3️⃣ Level 3: Deep Debugging & Secure Opt-In Env loading
@@ -382,15 +382,15 @@ devdoot.configure({
 
 ---
 
-## 🚨 Process Exit & Crash Monitoring (`devdoot.register()`)
+## 🚨 Process Exit & Crash Monitoring (`devdoot.startGlobalTracking()`)
 
-To automatically catch and log production crashes (`uncaughtException`, `unhandledRejection`, `SIGINT`, etc.) and output structured diagnostics, call `register()` once at the root entry point of your application (e.g. `index.js` or `server.js`).
+To automatically catch and log production crashes (`uncaughtException`, `unhandledRejection`, `SIGINT`, etc.) and output structured diagnostics, call `startGlobalTracking()` once at the root entry point of your application (e.g. `index.js` or `server.js`).
 
 ```typescript
 import devdoot from 'devdoot';
 
 // Hook process listeners
-devdoot.register({
+devdoot.startGlobalTracking({
   uncaughtException: true, // Generate diagnosis report and exit on uncaught errors
   unhandledRejection: true, // Handle unhandled promise rejections
   beforeExit: true,        // Save summary report upon clean process termination
@@ -402,7 +402,7 @@ devdoot.register({
 ```
 
 > [!NOTE]
-> **Global Deduplication Protection:** `register()` is completely idempotent. If called in multiple places (or in separate dependency installations), it uses a global `Symbol` to register each handler exactly once, preventing duplicate event hooks or memory leaks.
+> **Global Deduplication Protection:** `startGlobalTracking()` is completely idempotent. If called in multiple places (or in separate dependency installations), it uses a global `Symbol` to register each handler exactly once, preventing duplicate event hooks or memory leaks.
 
 ---
 

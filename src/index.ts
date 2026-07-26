@@ -9,6 +9,10 @@ export { getDiagnosticsSnapshot } from './diagnostics.js';
 export { initCrashReporter, generateReport, writeReport } from './reporter.js';
 export type { RegisterOptions } from './reporter.js';
 
+export function startGlobalTracking(options?: RegisterOptions): void {
+  devdoot.startGlobalTracking(options);
+}
+
 export function register(options?: RegisterOptions): void {
   devdoot.register(options);
 }

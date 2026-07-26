@@ -60,9 +60,13 @@ export class DevdootLogger {
     this.config.update(options);
   }
 
-  register(options?: RegisterOptions): void {
+  startGlobalTracking(options?: RegisterOptions): void {
     if (this.isNoop) return;
     initCrashReporter(options);
+  }
+
+  register(options?: RegisterOptions): void {
+    this.startGlobalTracking(options);
   }
 
   trace(message: any, meta?: any): void {

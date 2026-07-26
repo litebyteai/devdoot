@@ -322,7 +322,7 @@ describe('Global Process Registry', () => {
   });
 
   it('should register all 7 default event handlers', () => {
-    devdoot.register();
+    devdoot.startGlobalTracking();
 
     expect(process.on).toHaveBeenCalledWith('uncaughtException', expect.any(Function));
     expect(process.on).toHaveBeenCalledWith('unhandledRejection', expect.any(Function));
@@ -334,18 +334,18 @@ describe('Global Process Registry', () => {
   });
 
   it('should be idempotent and not register handlers twice', () => {
-    devdoot.register();
+    devdoot.startGlobalTracking();
     const callCountFirst = vi.mocked(process.on).mock.calls.length;
 
     // Call again, should not add new listeners
-    devdoot.register();
+    devdoot.startGlobalTracking();
     const callCountSecond = vi.mocked(process.on).mock.calls.length;
 
     expect(callCountFirst).toBe(callCountSecond);
   });
 
   it('should allow disabling specific event handlers', () => {
-    devdoot.register({
+    devdoot.startGlobalTracking({
       sigint: false,
       multipleResolves: false,
     });
@@ -367,7 +367,7 @@ describe('Global Process Registry', () => {
 
     const stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
 
-    devdoot.register();
+    devdoot.startGlobalTracking();
     const handler = onHandlers['uncaughtException']?.[0];
     expect(handler).toBeDefined();
 
@@ -400,7 +400,7 @@ describe('Global Process Registry', () => {
 
     const stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
 
-    devdoot.register({ exitOnError: false });
+    devdoot.startGlobalTracking({ exitOnError: false });
     const handler = onHandlers['uncaughtException']?.[0];
     expect(handler).toBeDefined();
 
@@ -428,7 +428,7 @@ describe('Global Process Registry', () => {
 
     const stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
 
-    devdoot.register();
+    devdoot.startGlobalTracking();
     const handler = onHandlers['SIGINT']?.[0];
     expect(handler).toBeDefined();
 
@@ -443,6 +443,13 @@ describe('Global Process Registry', () => {
       fs.unlinkSync(path.join(errDir, files[0]));
     }
     stderrSpy.mockRestore();
+  });
+
+  it('should support register as a deprecated alias to startGlobalTracking', () => {
+    const spy = vi.spyOn(devdoot, 'startGlobalTracking').mockImplementation(() => {});
+    devdoot.register({ exitOnError: false });
+    expect(spy).toHaveBeenCalledWith({ exitOnError: false });
+    spy.mockRestore();
   });
 });
 

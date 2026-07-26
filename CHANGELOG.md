@@ -7,6 +7,7 @@ All notable changes to the `devdoot` project will be documented in this file.
 ### Added
 - **Scoped Group Logger**: `devdoot.group('Name')` now returns a new isolated `DevdootLogger` instance bound to the specified group name, enabling group-scoped logging without reference collisions. Chaining and standalone calls remain fully backward compatible.
 - **Opt-In Secure Environment variables**: Added `allowEnv` configuration option (defaulting to `false`) to disable environment variable parsing by default. Lookups are executed dynamically using process indexer lookups (`process['env']`) to prevent static analysis warnings.
+- **Renamed register to startGlobalTracking**: Renamed `.register()` method to `.startGlobalTracking()` to make its purpose immediately clear to developers. Kept `.register()` as a deprecated alias for backward compatibility.
 
 ### Changed
 - **Zero-Dependency Build**: Completely eliminated `commander` and `open` runtime dependencies. Implemented lightweight, native argument parsing and platform-specific browser spawning using standard Node.js libraries.
@@ -15,4 +16,4 @@ All notable changes to the `devdoot` project will be documented in this file.
 - **Local Express Example Endpoint**: Updated `uses-example/typescript/axios-demo.ts` to hit a local Express server endpoint offline instead of querying public test sites.
 
 ### Fixed
-- **Process Crash Logs**: Verified and restored crash report file writing when `devdoot.register()` is explicitly invoked by developers.
+- **Process Crash Logs**: Verified and restored crash report file writing when `devdoot.startGlobalTracking()` is explicitly invoked by developers.
