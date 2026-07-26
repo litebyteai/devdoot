@@ -45,7 +45,15 @@ export function generateReport(error: Error): CrashReport {
  * Write a report object to disk synchronously (necessary for crash handling).
  */
 export function writeReport(report: CrashReport): string {
-  const dir = path.resolve(globalConfig.outputDir, 'reports');
+  const dateStr = (() => {
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  })();
+
+  const dir = path.resolve(globalConfig.outputDir, 'reports', dateStr);
   fs.mkdirSync(dir, { recursive: true });
   
   const filePath = path.join(dir, `report-${report.id}.txt`);

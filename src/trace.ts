@@ -111,9 +111,17 @@ export class TraceNode {
         completedRootTraces.shift();
       }
 
-      // Automatically save completed root trace to storage/devdoot/traces/trace-<id>.txt
+      // Automatically save completed root trace to storage/devdoot/traces/YYYY-MM-DD/trace-<id>.txt
       if (globalConfig.enabled && globalConfig.saveTraces) {
-        const dir = path.resolve(globalConfig.outputDir, 'traces');
+        const dateStr = (() => {
+          const d = new Date();
+          const yyyy = d.getFullYear();
+          const mm = String(d.getMonth() + 1).padStart(2, '0');
+          const dd = String(d.getDate()).padStart(2, '0');
+          return `${yyyy}-${mm}-${dd}`;
+        })();
+
+        const dir = path.resolve(globalConfig.outputDir, 'traces', dateStr);
         const filePath = path.join(dir, `trace-${this.id}.txt`);
         const textContent = renderTraceNodeToText(this);
 

@@ -264,9 +264,12 @@ describe('Configuration Options', () => {
 
     devdoot.configure({ enabled: true, saveTraces: false, outputDir: 'storage/devdoot_test' });
     const tracesDir = path.resolve('storage/devdoot_test/traces');
+    const d = new Date();
+    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const targetTracesDir = path.join(tracesDir, dateStr);
     
-    if (fs.existsSync(tracesDir)) {
-      fs.readdirSync(tracesDir).forEach(f => fs.unlinkSync(path.join(tracesDir, f)));
+    if (fs.existsSync(targetTracesDir)) {
+      fs.readdirSync(targetTracesDir).forEach(f => fs.unlinkSync(path.join(targetTracesDir, f)));
     }
 
     await runTraced('NoSaveTrace', async (trace) => {
@@ -274,7 +277,7 @@ describe('Configuration Options', () => {
     });
 
     await new Promise(resolve => setTimeout(resolve, 50));
-    const filesNoSave = fs.existsSync(tracesDir) ? fs.readdirSync(tracesDir) : [];
+    const filesNoSave = fs.existsSync(targetTracesDir) ? fs.readdirSync(targetTracesDir) : [];
     expect(filesNoSave.length).toBe(0);
 
     devdoot.configure({ saveTraces: true });
@@ -283,12 +286,17 @@ describe('Configuration Options', () => {
     });
 
     await new Promise(resolve => setTimeout(resolve, 50));
-    const filesSave = fs.existsSync(tracesDir) ? fs.readdirSync(tracesDir) : [];
+    const filesSave = fs.existsSync(targetTracesDir) ? fs.readdirSync(targetTracesDir) : [];
     expect(filesSave.length).toBeGreaterThan(0);
 
+    if (fs.existsSync(targetTracesDir)) {
+      fs.readdirSync(targetTracesDir).forEach(f => fs.unlinkSync(path.join(targetTracesDir, f)));
+      fs.rmdirSync(targetTracesDir);
+    }
     if (fs.existsSync(tracesDir)) {
-      fs.readdirSync(tracesDir).forEach(f => fs.unlinkSync(path.join(tracesDir, f)));
       fs.rmdirSync(tracesDir);
+    }
+    if (fs.existsSync(path.resolve('storage/devdoot_test'))) {
       fs.rmdirSync(path.resolve('storage/devdoot_test'));
     }
     devdoot.configure({ saveTraces: false, outputDir: 'storage/devdoot' });
@@ -357,10 +365,14 @@ describe('Global Process Registry', () => {
 
   it('should generate a crash report and exit on uncaughtException', () => {
     const errDir = path.resolve('storage/devdoot/reports');
-    if (fs.existsSync(errDir)) {
-      fs.readdirSync(errDir).forEach(f => {
+    const d = new Date();
+    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const targetReportsDir = path.join(errDir, dateStr);
+
+    if (fs.existsSync(targetReportsDir)) {
+      fs.readdirSync(targetReportsDir).forEach(f => {
         try {
-          fs.unlinkSync(path.join(errDir, f));
+          fs.unlinkSync(path.join(targetReportsDir, f));
         } catch (e) {}
       });
     }
@@ -378,22 +390,26 @@ describe('Global Process Registry', () => {
     expect(stderrSpy).toHaveBeenCalled();
 
     // Verify report was written
-    const files = fs.readdirSync(errDir);
+    const files = fs.readdirSync(targetReportsDir);
     expect(files.length).toBe(1);
-    const content = fs.readFileSync(path.join(errDir, files[0]), 'utf8');
+    const content = fs.readFileSync(path.join(targetReportsDir, files[0]), 'utf8');
     expect(content).toContain('Error:       Test Uncaught Exception');
 
     // Clean up
-    fs.unlinkSync(path.join(errDir, files[0]));
+    fs.unlinkSync(path.join(targetReportsDir, files[0]));
     stderrSpy.mockRestore();
   });
 
   it('should generate a crash report and NOT exit on uncaughtException if exitOnError is false', () => {
     const errDir = path.resolve('storage/devdoot/reports');
-    if (fs.existsSync(errDir)) {
-      fs.readdirSync(errDir).forEach(f => {
+    const d = new Date();
+    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const targetReportsDir = path.join(errDir, dateStr);
+
+    if (fs.existsSync(targetReportsDir)) {
+      fs.readdirSync(targetReportsDir).forEach(f => {
         try {
-          fs.unlinkSync(path.join(errDir, f));
+          fs.unlinkSync(path.join(targetReportsDir, f));
         } catch (e) {}
       });
     }
@@ -409,19 +425,23 @@ describe('Global Process Registry', () => {
     expect(process.exit).not.toHaveBeenCalled();
 
     // Clean up
-    const files = fs.readdirSync(errDir);
+    const files = fs.existsSync(targetReportsDir) ? fs.readdirSync(targetReportsDir) : [];
     if (files.length > 0) {
-      fs.unlinkSync(path.join(errDir, files[0]));
+      fs.unlinkSync(path.join(targetReportsDir, files[0]));
     }
     stderrSpy.mockRestore();
   });
 
   it('should generate a shutdown report on SIGINT', () => {
     const errDir = path.resolve('storage/devdoot/reports');
-    if (fs.existsSync(errDir)) {
-      fs.readdirSync(errDir).forEach(f => {
+    const d = new Date();
+    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const targetReportsDir = path.join(errDir, dateStr);
+
+    if (fs.existsSync(targetReportsDir)) {
+      fs.readdirSync(targetReportsDir).forEach(f => {
         try {
-          fs.unlinkSync(path.join(errDir, f));
+          fs.unlinkSync(path.join(targetReportsDir, f));
         } catch (e) {}
       });
     }
@@ -438,9 +458,9 @@ describe('Global Process Registry', () => {
     expect(stderrSpy).toHaveBeenCalled();
 
     // Clean up
-    const files = fs.readdirSync(errDir);
+    const files = fs.existsSync(targetReportsDir) ? fs.readdirSync(targetReportsDir) : [];
     if (files.length > 0) {
-      fs.unlinkSync(path.join(errDir, files[0]));
+      fs.unlinkSync(path.join(targetReportsDir, files[0]));
     }
     stderrSpy.mockRestore();
   });

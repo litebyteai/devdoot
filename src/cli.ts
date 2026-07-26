@@ -87,6 +87,22 @@ function runDoctor(): void {
   console.log(`Status:        \x1b[35m\x1b[1mSystem healthy. Ready to record traces.\x1b[0m\n`);
 }
 
+function getFilesRecursively(dir: string): string[] {
+  if (!fs.existsSync(dir)) return [];
+  const results: string[] = [];
+  const list = fs.readdirSync(dir);
+  list.forEach(file => {
+    const fullPath = path.join(dir, file);
+    const stat = fs.statSync(fullPath);
+    if (stat && stat.isDirectory()) {
+      results.push(...getFilesRecursively(fullPath));
+    } else if (file.endsWith('.txt')) {
+      results.push(fullPath);
+    }
+  });
+  return results;
+}
+
 function runReport(dirPath: string): void {
   const reportsDir = path.resolve(dirPath);
   if (!fs.existsSync(reportsDir)) {
@@ -94,7 +110,7 @@ function runReport(dirPath: string): void {
     return;
   }
 
-  const files = fs.readdirSync(reportsDir).filter(f => f.endsWith('.txt'));
+  const files = getFilesRecursively(reportsDir);
   if (files.length === 0) {
     console.log(`\n\x1b[33mNo reports (.txt) found in directory: ${reportsDir}\x1b[0m\n`);
     return;
@@ -104,26 +120,26 @@ function runReport(dirPath: string): void {
   console.log(`----------------------------------------`);
   files.forEach(file => {
     try {
-      const content = fs.readFileSync(path.join(reportsDir, file), 'utf8');
+      const content = fs.readFileSync(file, 'utf8');
 
       const idMatch = content.match(/Report ID:\s+(.+)/);
       const timeMatch = content.match(/Timestamp:\s+(.+)/);
       const errorMatch = content.match(/Error:\s+(.+)/);
       const osMatch = content.match(/OS Platform:\s+(.+)/);
 
-      const id = idMatch ? idMatch[1].trim() : file.replace('report-', '').replace('.txt', '');
+      const id = idMatch ? idMatch[1].trim() : path.basename(file).replace('report-', '').replace('.txt', '');
       const timestamp = timeMatch ? timeMatch[1].trim() : 'Unknown';
       const errorMessage = errorMatch ? errorMatch[1].trim() : 'Unknown';
       const os = osMatch ? osMatch[1].trim() : 'Unknown';
 
-      console.log(`📄 \x1b[36m${file}\x1b[0m`);
+      console.log(`📄 \x1b[36m${path.basename(file)}\x1b[0m`);
       console.log(`   Time:  ${timestamp}`);
       console.log(`   Error: \x1b[31m${errorMessage}\x1b[0m`);
       console.log(`   OS:    ${os}`);
-      console.log(`   Path:  ${path.join(reportsDir, file)}`);
+      console.log(`   Path:  ${file}`);
       console.log(`----------------------------------------`);
     } catch (err) {
-      console.log(`❌ Failed to parse report: ${file}`);
+      console.log(`❌ Failed to parse report: ${path.basename(file)}`);
     }
   });
   console.log(`Run \x1b[35mdevdoot open <report-file-path>\x1b[0m to view execution details.\n`);
@@ -136,7 +152,7 @@ function runGroups(dirPath: string): void {
     return;
   }
 
-  const files = fs.readdirSync(tracesDir).filter(f => f.endsWith('.txt'));
+  const files = getFilesRecursively(tracesDir);
   if (files.length === 0) {
     console.log(`\n\x1b[33mNo trace files (.txt) found in directory: ${tracesDir}\x1b[0m\n`);
     return;
@@ -146,7 +162,7 @@ function runGroups(dirPath: string): void {
 
   files.forEach(file => {
     try {
-      const content = fs.readFileSync(path.join(tracesDir, file), 'utf8');
+      const content = fs.readFileSync(file, 'utf8');
 
       // Match logs like: [INFO] [GroupName]
       const groupRegex = /\[(?:INFO|WARN|ERROR|TRACE|DEBUG)\]\s+\[([^\]]+)\]/g;
