@@ -2,13 +2,17 @@
 
 All notable changes to the `devdoot` project will be documented in this file.
 
+## [0.0.5] - 2026-07-26
+
+### Added
+- **Date-Wise Logging Directories**: Successful traces and crash reports are now saved under daily `YYYY-MM-DD` subdirectories (e.g. `storage/devdoot/traces/YYYY-MM-DD/` and `storage/devdoot/reports/YYYY-MM-DD/`). Updated Devdoot CLI crawlers to scan these subfolders recursively.
+
 ## [0.0.4] - 2026-07-26
 
 ### Added
 - **Scoped Group Logger**: `devdoot.group('Name')` now returns a new isolated `DevdootLogger` instance bound to the specified group name, enabling group-scoped logging without reference collisions. Chaining and standalone calls remain fully backward compatible.
 - **Renamed register to startGlobalTracking**: Renamed `.register()` method to `.startGlobalTracking()` to make its purpose immediately clear to developers. Kept `.register()` as a deprecated alias for backward compatibility.
 - **Hinglish Documentation**: Added `README-hinglish.md` translating the documentation to Hinglish.
-- **Date-Wise Logging Directories**: Successful traces and crash reports are now saved under daily `YYYY-MM-DD` subdirectories (e.g. `storage/devdoot/traces/YYYY-MM-DD/` and `storage/devdoot/reports/YYYY-MM-DD/`). Updated Devdoot CLI crawlers to scan these subfolders recursively.
 
 ## [0.0.3] - 2026-07-26
 

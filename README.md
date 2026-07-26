@@ -334,11 +334,11 @@ import devdoot from 'devdoot';
 
 // 1. Enable local trace saving to files
 devdoot.configure({
-  saveTraces: true // Writes completed traces to storage/devdoot/traces/*.txt
+  saveTraces: true // Writes completed traces to storage/devdoot/traces/YYYY-MM-DD/*.txt
 });
 
 // 2. Start global process tracking
-// Saves detailed reports to storage/devdoot/reports/ on exit, SIGINT, or crash.
+// Saves detailed reports to storage/devdoot/reports/YYYY-MM-DD/ on exit, SIGINT, or crash.
 devdoot.startGlobalTracking();
 ```
 

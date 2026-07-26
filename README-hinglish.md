@@ -64,7 +64,7 @@ import devdoot from 'devdoot';
 
 // 1. Trace files save karne ke liye configure karein
 devdoot.configure({
-  saveTraces: true // Traces save honge storage/devdoot/traces/*.txt me
+  saveTraces: true // Traces save honge storage/devdoot/traces/YYYY-MM-DD/*.txt me
 });
 
 // 2. Global process listeners hook karein
