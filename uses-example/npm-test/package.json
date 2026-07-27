@@ -1,0 +1,11 @@
+{
+  "name": "devdoot-example-npm",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "demo": "node demo.js"
+  },
+  "dependencies": {
+    "devdoot": "latest"
+  }
+}
