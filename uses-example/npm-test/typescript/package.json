@@ -1,0 +1,13 @@
+{
+  "name": "devdoot-example-npm-typescript",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "demo": "tsx demo.ts"
+  },
+  "dependencies": {
+    "devdoot": "latest",
+    "tsx": "^4.23.1",
+    "typescript": "^5.6.3"
+  }
+}
