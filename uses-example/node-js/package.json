@@ -7,7 +7,7 @@
     "express": "node express-demo.js"
   },
   "dependencies": {
-    "devdoot": "^0.0.2",
+    "devdoot": "file:../..",
     "express": "^4.19.2"
   }
 }

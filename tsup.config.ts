@@ -14,7 +14,8 @@ export default defineConfig({
     formatter: 'src/formatter.ts',
     time: 'src/time.ts',
     caller: 'src/caller.ts',
-    context: 'src/context.ts'
+    context: 'src/context.ts',
+    config: 'src/config.ts'
   },
   format: ['cjs', 'esm'],
   dts: true,
