@@ -2,6 +2,12 @@
 
 All notable changes to the `devdoot` project will be documented in this file.
 
+## [0.0.8] - 2026-07-28
+
+### Added
+- **Default Environment Variable Scanning**: Changed the default value of `allowEnv` from `false` to `true`. Devdoot now scans and loads environment configurations automatically on startup with zero setup code.
+- **New Environment Fallbacks (`DEVDOOT_DEFAULT_LEVEL`)**: Added support for reading logging level overrides from `DEVDOOT_DEFAULT_LEVEL` and `DEVDOOT_DEFAULT_LOG_LEVEL` environment variables.
+
 ## [0.0.7] - 2026-07-28
 
 ### Fixed

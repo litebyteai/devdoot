@@ -36,7 +36,7 @@ export class DevdootConfig {
   allowEnv: boolean;
 
   constructor(options: DevdootOptions = {}) {
-    this.allowEnv = options.allowEnv ?? false;
+    this.allowEnv = options.allowEnv ?? true;
 
     const getEnv = (key: string): string | undefined => {
       if (!this.allowEnv) return undefined;
@@ -54,7 +54,7 @@ export class DevdootConfig {
 
     this.inProd = options.inProd ?? isProduction;
 
-    const envLevel = getEnv('DEVDOOT_LEVEL') || getEnv('DEVDOOT_LOG_LEVEL');
+    const envLevel = getEnv('DEVDOOT_LEVEL') || getEnv('DEVDOOT_LOG_LEVEL') || getEnv('DEVDOOT_DEFAULT_LEVEL') || getEnv('DEVDOOT_DEFAULT_LOG_LEVEL');
     this.levelName = options.level ?? (envLevel as LogLevelName) ?? (this.inProd ? 'error' : 'info');
     this.level = this.parseLevel(this.levelName);
 

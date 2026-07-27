@@ -348,8 +348,8 @@ devdoot.configure({
 devdoot.startGlobalTracking();
 ```
 
-### 3️⃣ Level 3: Deep Debugging & Secure Opt-In Env loading
-For large production environments or active debug sessions, you can enable deep debugging, filter by specific logging groups, and securely opt-in to loading configs from environment variables.
+### 3️⃣ Level 3: Deep Debugging & Zero-Code Environment Variables
+For large production environments or active debug sessions, you can enable deep debugging, filter by specific logging groups, and leverage environment variables out-of-the-box.
 
 ```typescript
 import devdoot from 'devdoot';
@@ -360,9 +360,8 @@ devdoot.configure({
   deepDebugGroups: ['AuthSystem', 'DatabaseQuery'],
   outputDir: 'var/logs/devdoot',
   
-  // SECURE OPT-IN:
-  // Allow Devdoot to securely look up environment configs from process['env'].
-  // If false (default), environment lookups are disabled for maximum security.
+  // Environment variables are scanned by default (allowEnv: true).
+  // Set to false if you wish to explicitly ignore environment settings.
   allowEnv: true
 });
 ```
@@ -405,17 +404,17 @@ Devdoot allows you to categorize and group logs by module/service. There are two
 
 ## 🛠️ Complete Configuration Reference
 
-`devdoot` properties can be configured programmatically or securely loaded from environment variables (when `allowEnv: true` is configured).
+`devdoot` properties can be configured programmatically or loaded from environment variables (since `allowEnv` defaults to `true` to allow easy zero-setup environment configuration).
 
 ### Configuration Options & Env Variables
 
 | Programmatic Option | Env Variable | Default | Benefit & Security Context |
 | :--- | :--- | :--- | :--- |
-| **`allowEnv`** | *N/A* | `false` | **Security Toggle.** If `false`, `devdoot` never accesses `process['env']`, preventing env scanning. |
+| **`allowEnv`** | *N/A* | `true` | **Security Toggle.** If set to `false`, `devdoot` never accesses `process['env']`, preventing env scanning. |
 | **`saveTraces`** | `DEVDOOT_SAVE_TRACES` | `false` | Writes successful traces to `.txt` files. Keeps production clean when disabled. |
 | **`enabled`** | `DEVDOOT_ENABLED` | `true` | Quickly turn off all logger formatting and telemetry hooks. |
-| **`level`** | `DEVDOOT_LEVEL` | `'info'` | Filters log statements (`trace`, `debug`, `info`, `warn`, `error`). |
-| **`format`** | `DEVDOOT_FORMAT` | `'console'` | Outputs log files as human-friendly `'console'` terminal lines or raw `'json'`. |
+| **`level`** | `DEVDOOT_LEVEL`, `DEVDOOT_LOG_LEVEL`, `DEVDOOT_DEFAULT_LEVEL` | `'info'` | Filters log statements (`trace`, `debug`, `info`, `warn`, `error`). |
+| **`format`** | `DEVDOOT_FORMAT`, `DEVDOOT_LOG_FORMAT` | `'console'` | Outputs log files as human-friendly `'console'` terminal lines or raw `'json'`. |
 | **`deepDebugging`** | `DEVDOOT_DEEP_DEBUGGING` | `false` | Performance bypass. When `false`, calling `devdoot.debug()` returns a frozen `NOOP` instance (running at **60M+ ops/sec**). |
 | **`deepDebugGroups`** | `DEVDOOT_DEEP_DEBUG_GROUPS` | `All` | Filters debug logs to only show specific group logs. |
 | **`outputDir`** | `DEVDOOT_OUTPUT_DIR` | `'storage/devdoot'` | Destination folder for local traces and crash reports. |

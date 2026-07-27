@@ -147,13 +147,13 @@ describe('Plugins', () => {
 });
 
 describe('Configuration Options', () => {
-  it('should load properties from environment variables', () => {
+  it('should default allowEnv to true and load properties from environment variables automatically', () => {
     process.env.DEVDOOT_LOG_LEVEL = 'warn';
     process.env.DEVDOOT_FORMAT = 'json';
     process.env.DEVDOOT_ENABLED = 'false';
 
-    const config = new DevdootConfig({ allowEnv: true });
-    
+    const config = new DevdootConfig();
+    expect(config.allowEnv).toBe(true);
     expect(config.levelName).toBe('warn');
     expect(config.format).toBe('json');
     expect(config.enabled).toBe(false);
@@ -162,6 +162,26 @@ describe('Configuration Options', () => {
     delete process.env.DEVDOOT_LOG_LEVEL;
     delete process.env.DEVDOOT_FORMAT;
     delete process.env.DEVDOOT_ENABLED;
+  });
+
+  it('should respect DEVDOOT_DEFAULT_LEVEL and DEVDOOT_DEFAULT_LOG_LEVEL', () => {
+    process.env.DEVDOOT_DEFAULT_LEVEL = 'error';
+    const config = new DevdootConfig();
+    expect(config.levelName).toBe('error');
+    delete process.env.DEVDOOT_DEFAULT_LEVEL;
+
+    process.env.DEVDOOT_DEFAULT_LOG_LEVEL = 'warn';
+    const config2 = new DevdootConfig();
+    expect(config2.levelName).toBe('warn');
+    delete process.env.DEVDOOT_DEFAULT_LOG_LEVEL;
+  });
+
+  it('should ignore environment variables when allowEnv is explicitly set to false', () => {
+    process.env.DEVDOOT_LOG_LEVEL = 'warn';
+    const config = new DevdootConfig({ allowEnv: false });
+    expect(config.allowEnv).toBe(false);
+    expect(config.levelName).not.toBe('warn');
+    delete process.env.DEVDOOT_LOG_LEVEL;
   });
 
   it('should support programmatic configuration via configure API', () => {
@@ -241,7 +261,7 @@ describe('Configuration Options', () => {
 
   it('should support selective deep debugging group filters via config and env', () => {
     process.env.DEVDOOT_DEEP_DEBUG_GROUPS = 'Auth, Database ';
-    const config = new DevdootConfig({ allowEnv: true });
+    const config = new DevdootConfig();
     expect(config.deepDebugGroups).toEqual(['Auth', 'Database']);
     delete process.env.DEVDOOT_DEEP_DEBUG_GROUPS;
 
@@ -263,7 +283,7 @@ describe('Configuration Options', () => {
 
   it('should support saveTraces configuration and env variable toggling', async () => {
     process.env.DEVDOOT_SAVE_TRACES = 'true';
-    const config = new DevdootConfig({ allowEnv: true });
+    const config = new DevdootConfig();
     expect(config.saveTraces).toBe(true);
     delete process.env.DEVDOOT_SAVE_TRACES;
 

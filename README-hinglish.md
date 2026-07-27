@@ -77,8 +77,8 @@ devdoot.configure({
 devdoot.startGlobalTracking();
 ```
 
-### 3️⃣ Level 3: Deep Debugging & Secure Env Scanning
-Production ya heavy debugging sessions ke liye specific groups filter karein, deep debugging enable karein, aur securely environment variables load karne ka permission dein:
+### 3️⃣ Level 3: Deep Debugging & Zero-Code Environment Variables
+Production ya heavy debugging sessions ke liye specific groups filter karein, deep debugging enable karein, aur out-of-the-box environment variables load karein:
 
 ```typescript
 import devdoot from 'devdoot';
@@ -89,9 +89,8 @@ devdoot.configure({
   deepDebugGroups: ['AuthSystem', 'DatabaseQuery'],
   outputDir: 'var/logs/devdoot',
   
-  // SECURE OPT-IN:
-  // process['env'] scan karne ki permission dein. 
-  // Agar ye false (default) hai, toh koi environment variables read nahi honge.
+  // Environment variables by default scan hote hain (allowEnv: true).
+  // Agar aap environment configurations ko ignore karna chahte hain, toh ise false set karein.
   allowEnv: true
 });
 ```
@@ -134,15 +133,15 @@ Devdoot me aap apne logs ko module/service ke hisab se categorize aur group kar 
 
 ## 🛠️ Complete Configuration Reference
 
-Devdoot ko programmatically configure kiya jaa sakta hai, ya environment variables se settings load ki jaa sakti hain (sirf tab jab `allowEnv: true` ho).
+Devdoot ko programmatically configure kiya jaa sakta hai, ya environment variables se settings load ki jaa sakti hain (since `allowEnv` defaults to `true` to allow easy zero-setup environment configuration).
 
 | Option | Env Variable | Default | Faida aur Security Context |
 | :--- | :--- | :--- | :--- |
-| **`allowEnv`** | *N/A* | `false` | **Security Toggle.** `false` hone par Devdoot `process['env']` ko touch bhi nahi karega. |
+| **`allowEnv`** | *N/A* | `true` | **Security Toggle.** `false` hone par Devdoot `process['env']` ko touch bhi nahi karega. |
 | **`saveTraces`** | `DEVDOOT_SAVE_TRACES` | `false` | Successful traces ko `.txt` file me write karta hai. |
 | **`enabled`** | `DEVDOOT_ENABLED` | `true` | Devdoot logging aur diagnostic engine ko fully on/off karne ke liye. |
-| **`level`** | `DEVDOOT_LEVEL` | `'info'` | Log filtering levels (`trace`, `debug`, `info`, `warn`, `error`). |
-| **`format`** | `DEVDOOT_FORMAT` | `'console'` | Output format: human-readable `'console'` lines ya raw `'json'`. |
+| **`level`** | `DEVDOOT_LEVEL`, `DEVDOOT_LOG_LEVEL`, `DEVDOOT_DEFAULT_LEVEL` | `'info'` | Log filtering levels (`trace`, `debug`, `info`, `warn`, `error`). |
+| **`format`** | `DEVDOOT_FORMAT`, `DEVDOOT_LOG_FORMAT` | `'console'` | Output format: human-readable `'console'` lines ya raw `'json'`. |
 | **`deepDebugging`** | `DEVDOOT_DEEP_DEBUGGING` | `false` | `false` hone par `devdoot.debug()` seedhe ek `NOOP` freeze logger return karega jo **60M+ ops/sec** par chalta hai. |
 | **`deepDebugGroups`** | `DEVDOOT_DEEP_DEBUG_GROUPS` | `All` | Sirf specific groups ke debug logs print karne ke liye. |
 | **`outputDir`** | `DEVDOOT_OUTPUT_DIR` | `'storage/devdoot'` | Traces aur Crash Reports save karne ka root directory folder. |
