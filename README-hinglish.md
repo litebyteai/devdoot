@@ -42,7 +42,12 @@ import devdoot, { runTraced } from 'devdoot';
 devdoot.info('Hello from devdoot!');
 
 // Scoped logging groups use karein
-const billingLogger = devdoot.group('BillingService');
+// Calling group() updates current instance's group (zero allocation!)
+devdoot.group('BillingService');
+devdoot.info('Invoice #1024 paid successfully.');
+
+// Isolated logger instance ke liye newGroup() use karein:
+const billingLogger = devdoot.newGroup('BillingService');
 billingLogger.info('Invoice #1024 paid successfully.');
 
 // Execution hierarchy track karne ke liye traces banayein
@@ -90,6 +95,40 @@ devdoot.configure({
   allowEnv: true
 });
 ```
+
+---
+
+## 🏷️ Group Logging: `group()` vs `newGroup()`
+
+Devdoot me aap apne logs ko module/service ke hisab se categorize aur group kar sakte hain. Memory performance aur isolation ke liye do approaches hain:
+
+### 1. `devdoot.group(name)` (Zero Allocation - Default)
+*   **Best For:** Simple, inline grouping.
+*   **Behavior:** Yeh current/global logger instance par group name set karta hai aur `this` return karta hai.
+*   **Faida:** **`0` extra memory allocation!** High-performance loops ya standard request logs ke liye perfect hai, jahan aap bina kisi extra memory load ke log headers set karna chahte hain.
+*   **Example:**
+    ```typescript
+    devdoot.group('DatabaseQuery');
+    devdoot.info('Executing SELECT * FROM users'); // Logs under [DatabaseQuery]
+    devdoot.info('Query took 4ms');                // Logs under [DatabaseQuery]
+    
+    devdoot.group(''); // Reset back to default
+    ```
+
+### 2. `devdoot.newGroup(name, config?)` (Isolated Instance)
+*   **Best For:** Kisi specific service (jaise database queries, mail service) ke liye ek bilkul alag, isolated logger banana bina global options ko affect kiye.
+*   **Behavior:** Yeh ek **brand new** aur independent `DevdootLogger` object instantiate karke return karta hai.
+*   **Faida:** Yeh independent hota hai aur second parameter me options accept karta hai jisse aap sirf us specific group ke logs ki configurations badal sakte hain.
+*   **Example:**
+    ```typescript
+    // Isolated group loggers spawn karein
+    const dbLogger = devdoot.newGroup('Database');
+    const paymentLogger = devdoot.newGroup('Payments', { level: 'warn' }); // Mail payments ke liye warnings hi print karega
+    
+    dbLogger.info('Connected to PostgreSQL'); // Logs under [Database]
+    paymentLogger.info('Transacting...');      // Silenced (warn level active hai)
+    paymentLogger.warn('Gateway timeout!');    // Logs under [Payments] (Visible!)
+    ```
 
 ---
 

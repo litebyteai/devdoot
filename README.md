@@ -22,8 +22,8 @@ import devdoot from 'devdoot';
 
 devdoot.log('Application started');
 
-const database = devdoot.group('Database');
-const apiResponse = devdoot.group('ApiResponse');
+const database = devdoot.newGroup('Database');
+const apiResponse = devdoot.newGroup('ApiResponse');
 
 database.log('Fetching users...');
 database.info('100 records fetched', { count: 100 });
@@ -311,8 +311,12 @@ import devdoot, { runTraced } from 'devdoot';
 devdoot.info('Hello from devdoot!');
 
 // Use groups to filter/organize logs dynamically
-// Calling group() returns a new isolated logger instance bound to that group!
-const billingLogger = devdoot.group('BillingService');
+// Calling group() updates the current instance's group (zero allocation!)
+devdoot.group('BillingService');
+devdoot.info('Invoice #1024 paid.');
+
+// Need an isolated sub-logger instance? Use newGroup()!
+const billingLogger = devdoot.newGroup('BillingService');
 billingLogger.info('Invoice #1024 paid.');
 
 // Create traces to track execution hierarchy and latencies
@@ -360,6 +364,40 @@ devdoot.configure({
   allowEnv: true
 });
 ```
+
+---
+
+## 🏷️ Group Logging: `group()` vs `newGroup()`
+
+Devdoot allows you to categorize and group logs by module/service. There are two ways to do this depending on your memory and isolation requirements:
+
+### 1. `devdoot.group(name)` (Zero Allocation - Default)
+*   **Best For:** Simple, inline grouping.
+*   **Behavior:** Modifies the category name directly on the **existing/current** logger instance and returns `this`.
+*   **Benefit:** **`0` extra memory allocations!** Perfect for high-performance loops or standard request logging where you just want to label subsequent logs without generating heap overhead.
+*   **Example:**
+    ```typescript
+    devdoot.group('DatabaseQuery');
+    devdoot.info('Executing SELECT * FROM users'); // Logs under [DatabaseQuery]
+    devdoot.info('Query took 4ms');                // Logs under [DatabaseQuery]
+    
+    devdoot.group(''); // Reset group back to default
+    ```
+
+### 2. `devdoot.newGroup(name, config?)` (Isolated Instance)
+*   **Best For:** Creating separate, persistent loggers for specific services (e.g. database pool, payment gateway) without affecting the global logger configuration.
+*   **Behavior:** Instantiates and returns a **brand new** isolated `DevdootLogger` instance bound to the specified group name.
+*   **Benefit:** Completely isolated from other logger instances. It also accepts an optional second parameter to customize the configuration (e.g., custom logging level) just for that group.
+*   **Example:**
+    ```typescript
+    // Spawn isolated group loggers
+    const dbLogger = devdoot.newGroup('Database');
+    const paymentLogger = devdoot.newGroup('Payments', { level: 'warn' }); // Only show warnings/errors for payments
+    
+    dbLogger.info('Connected to PostgreSQL'); // Logs under [Database]
+    paymentLogger.info('Transacting...');      // Silenced (due to 'warn' level config override)
+    paymentLogger.warn('Gateway timeout!');    // Logs under [Payments] (Visible!)
+    ```
 
 ---
 
