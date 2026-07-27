@@ -207,18 +207,23 @@ describe('Configuration Options', () => {
     devdoot.group('');
   });
 
-  it('should return a new isolated logger instance from group() and cache it', () => {
-    const dblog1 = devdoot.group('Database');
-    const dblog2 = devdoot.group('Database');
-    const authlog = devdoot.group('Auth');
+  it('should return a new isolated logger instance from newGroup()', () => {
+    const dblog = devdoot.newGroup('Database');
+    const authlog = devdoot.newGroup('Auth');
     
-    expect(dblog1).not.toBe(devdoot);
+    expect(dblog).not.toBe(devdoot);
     expect(authlog).not.toBe(devdoot);
-    expect(dblog1).not.toBe(authlog);
-    expect(dblog1).toBe(dblog2);
+    expect(dblog).not.toBe(authlog);
     
-    expect(dblog1.currentGroup).toBe('Database');
+    expect(dblog.currentGroup).toBe('Database');
     expect(authlog.currentGroup).toBe('Auth');
+  });
+
+  it('should return this from group() to modify current instance with zero allocation', () => {
+    const returned = devdoot.group('TestGroup');
+    expect(returned).toBe(devdoot);
+    expect(devdoot.currentGroup).toBe('TestGroup');
+    devdoot.group('');
   });
 
   it('should support custom instances and isolation via Devdoot class and create()', () => {
@@ -243,17 +248,15 @@ describe('Configuration Options', () => {
     devdoot.configure({ deepDebugging: true, deepDebugGroups: ['Database'], level: 'trace', format: 'console' });
     const consoleSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
 
-    const resultAuth = devdoot.group('Auth').debug();
+    const resultAuth = devdoot.newGroup('Auth').debug();
     expect(resultAuth).toBe(NOOP_LOGGER);
     resultAuth.log('Auth debug message');
     expect(consoleSpy).not.toHaveBeenCalled();
 
-    const resultDb = devdoot.group('Database').debug();
+    const resultDb = devdoot.newGroup('Database').debug();
     expect(resultDb).not.toBe(NOOP_LOGGER);
     resultDb.log('Database debug message');
     expect(consoleSpy).toHaveBeenCalled();
-
-    devdoot.group('');
     devdoot.configure({ deepDebugGroups: undefined });
     consoleSpy.mockRestore();
   });

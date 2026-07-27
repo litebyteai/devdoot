@@ -22,8 +22,8 @@ devdoot.info('User session established successfully.');
 
 console.log('\n=== 1b. Scoped Group Logger Demo ===');
 // Returns a new isolated logger instance bound to the group name!
-const dbLogger = devdoot.group('Database');
-const paymentLogger = devdoot.group('PaymentGateway');
+const dbLogger = devdoot.newGroup('Database');
+const paymentLogger = devdoot.newGroup('PaymentGateway');
 
 dbLogger.info('Verifying connection pool...');
 paymentLogger.warn('Payment API returned high latency (820ms)');

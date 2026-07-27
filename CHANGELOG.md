@@ -6,7 +6,8 @@ All notable changes to the `devdoot` project will be documented in this file.
 
 ### Added
 - **Date-Wise Logging Directories**: Successful traces and crash reports are now saved under daily `YYYY-MM-DD` subdirectories (e.g. `storage/devdoot/traces/YYYY-MM-DD/` and `storage/devdoot/reports/YYYY-MM-DD/`). Updated Devdoot CLI crawlers to scan these subfolders recursively.
-- **Group Logger Instance Caching**: Optimized `.group(name)` to store and reuse created logger instances in a private cache map. This prevents garbage collection overhead and memory allocations when `.group()` is called repeatedly in hot paths.
+- **Group Logging Allocation Optimization**: Optimized `.group(name)` to modify and return the *current* logger instance. This results in **zero extra memory allocations** by default when setting logging categories.
+- **New Isolated Logger API (`newGroup`)**: Added `devdoot.newGroup(name, options?)` which returns a brand new isolated `DevdootLogger` instance with optional configuration overrides, for cases where developers explicitly want to spawn independent sub-loggers.
 
 ### Fixed
 - **Missing Build Target in Entry Points**: Added `config.ts` explicitly to `tsup.config.ts` entry points. When compilation format is set to unbundled (`bundle: false`), omitting `config.ts` from entry points caused `dist/config.js` to be missing from the build output, crashing imports of the compiled package.
