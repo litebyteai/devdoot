@@ -2,12 +2,18 @@
 
 All notable changes to the `devdoot` project will be documented in this file.
 
+## [0.0.6] - 2026-07-28
+
+### Added
+- **New Isolated Logger API (`newGroup`)**: Added `devdoot.newGroup(name, options?)` which returns a brand new isolated `DevdootLogger` instance with optional configuration overrides, for cases where developers explicitly want to spawn independent sub-loggers.
+
+### Changed
+- **Group Logging Performance Optimization**: Optimized `.group(name)` to modify and return the *current* logger instance (resulting in **zero extra memory allocations** by default). In version `0.0.4`, we changed `.group()` to always return a new instance, but real-world testing in production projects revealed this created significant memory allocation and Garbage Collection overhead in high-throughput loops. This release keeps the default case fast (zero allocation) and moves isolated instance creation to the explicit `.newGroup()` API.
+
 ## [0.0.5] - 2026-07-28
 
 ### Added
 - **Date-Wise Logging Directories**: Successful traces and crash reports are now saved under daily `YYYY-MM-DD` subdirectories (e.g. `storage/devdoot/traces/YYYY-MM-DD/` and `storage/devdoot/reports/YYYY-MM-DD/`). Updated Devdoot CLI crawlers to scan these subfolders recursively.
-- **Group Logging Allocation Optimization**: Optimized `.group(name)` to modify and return the *current* logger instance. This results in **zero extra memory allocations** by default when setting logging categories.
-- **New Isolated Logger API (`newGroup`)**: Added `devdoot.newGroup(name, options?)` which returns a brand new isolated `DevdootLogger` instance with optional configuration overrides, for cases where developers explicitly want to spawn independent sub-loggers.
 
 ### Fixed
 - **Missing Build Target in Entry Points**: Added `config.ts` explicitly to `tsup.config.ts` entry points. When compilation format is set to unbundled (`bundle: false`), omitting `config.ts` from entry points caused `dist/config.js` to be missing from the build output, crashing imports of the compiled package.

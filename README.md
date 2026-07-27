@@ -22,18 +22,20 @@ import devdoot from 'devdoot';
 
 devdoot.log('Application started');
 
-const database = devdoot.newGroup('Database');
-const apiResponse = devdoot.newGroup('ApiResponse');
-
-database.log('Fetching users...');
-database.info('100 records fetched', { count: 100 });
-
-apiResponse.success('GET /api/users', { status: 200 });
+// 1. Non-Invasive Inline Grouping (Zero Allocation)
+// Sets the logging group directly on the current instance
+devdoot.group('Database');
+devdoot.log('Fetching users...');
+devdoot.info('100 records fetched', { count: 100 });
 
 // Only shown when deep debugging is enabled
-database.debug().warn('Fetched user data', users);
+devdoot.debug().warn('Fetched user data', users);
+devdoot.error('Database connection failed', error);
 
-database.error('Database connection failed', error);
+// 2. Isolated Group Logger (newGroup)
+// Returns a brand new isolated logger instance
+const apiResponse = devdoot.newGroup('ApiResponse');
+apiResponse.success('GET /api/users', { status: 200 });
 ```
 
 Output:
