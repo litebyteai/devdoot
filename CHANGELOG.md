@@ -2,10 +2,13 @@
 
 All notable changes to the `devdoot` project will be documented in this file.
 
-## [0.0.5] - 2026-07-26
+## [0.0.5] - 2026-07-28
 
 ### Added
 - **Date-Wise Logging Directories**: Successful traces and crash reports are now saved under daily `YYYY-MM-DD` subdirectories (e.g. `storage/devdoot/traces/YYYY-MM-DD/` and `storage/devdoot/reports/YYYY-MM-DD/`). Updated Devdoot CLI crawlers to scan these subfolders recursively.
+
+### Fixed
+- **Missing Build Target in Entry Points**: Added `config.ts` explicitly to `tsup.config.ts` entry points. When compilation format is set to unbundled (`bundle: false`), omitting `config.ts` from entry points caused `dist/config.js` to be missing from the build output, crashing imports of the compiled package.
 
 ## [0.0.4] - 2026-07-26
 
