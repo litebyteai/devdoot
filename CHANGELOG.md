@@ -2,6 +2,11 @@
 
 All notable changes to the `devdoot` project will be documented in this file.
 
+## [0.0.7] - 2026-07-28
+
+### Fixed
+- **Type-Only Export Resolution**: Exported `DevdootOptions` explicitly as a type-only export (`export type { DevdootOptions }`) in `src/index.ts`. This prevents Node's ESM loader from crashing with a `SyntaxError` at runtime when attempting to resolve a physical export for stripped TypeScript interfaces.
+
 ## [0.0.6] - 2026-07-28
 
 ### Added
