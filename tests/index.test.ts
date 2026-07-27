@@ -207,15 +207,17 @@ describe('Configuration Options', () => {
     devdoot.group('');
   });
 
-  it('should return a new isolated logger instance from group()', () => {
-    const dblog = devdoot.group('Database');
+  it('should return a new isolated logger instance from group() and cache it', () => {
+    const dblog1 = devdoot.group('Database');
+    const dblog2 = devdoot.group('Database');
     const authlog = devdoot.group('Auth');
     
-    expect(dblog).not.toBe(devdoot);
+    expect(dblog1).not.toBe(devdoot);
     expect(authlog).not.toBe(devdoot);
-    expect(dblog).not.toBe(authlog);
+    expect(dblog1).not.toBe(authlog);
+    expect(dblog1).toBe(dblog2);
     
-    expect(dblog.currentGroup).toBe('Database');
+    expect(dblog1.currentGroup).toBe('Database');
     expect(authlog.currentGroup).toBe('Auth');
   });
 

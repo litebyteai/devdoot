@@ -33,6 +33,8 @@ export class DevdootLogger {
   currentGroup: string | null = null;
   private isNoop: boolean;
 
+  private groupLoggers = new Map<string, DevdootLogger>();
+
   constructor(configOrOptions: DevdootConfig | DevdootOptions = globalConfig, isNoop = false) {
     if (configOrOptions instanceof DevdootConfig) {
       this.config = configOrOptions;
@@ -46,8 +48,12 @@ export class DevdootLogger {
     if (this.isNoop) return this;
     this.currentGroup = name;
     
-    const groupedLogger = new DevdootLogger(this.config);
-    groupedLogger.currentGroup = name;
+    let groupedLogger = this.groupLoggers.get(name);
+    if (!groupedLogger) {
+      groupedLogger = new DevdootLogger(this.config);
+      groupedLogger.currentGroup = name;
+      this.groupLoggers.set(name, groupedLogger);
+    }
     return groupedLogger;
   }
 
