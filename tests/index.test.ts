@@ -190,6 +190,60 @@ describe('Configuration Options', () => {
     expect(globalConfig.format).toBe('json');
   });
 
+  it('should format console timing as [+diff = total]', () => {
+    devdoot.configure({ level: 'trace', format: 'console' });
+    const consoleSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
+    
+    devdoot.info('Testing timing format');
+    
+    expect(consoleSpy).toHaveBeenCalled();
+    const printedStr = consoleSpy.mock.calls[0][0] as string;
+    expect(printedStr).toMatch(/\[\+\d+ = \d+ms\]/);
+    
+    consoleSpy.mockRestore();
+  });
+
+  it('should support multiple arguments like console.log and format placeholders', () => {
+    devdoot.configure({ level: 'trace', format: 'console' });
+    const consoleSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
+    
+    try {
+      // 1. Multiple plain arguments
+      devdoot.info('Hello', 'World', 123);
+      expect(consoleSpy).toHaveBeenLastCalledWith(expect.stringContaining('Hello World 123'));
+
+      // 2. Format placeholders
+      devdoot.info('User %s has %d items', 'bob', 5);
+      expect(consoleSpy).toHaveBeenLastCalledWith(expect.stringContaining('User bob has 5 items'));
+
+      // 3. Object formatting
+      devdoot.info('Stats:', { active: true });
+      expect(consoleSpy).toHaveBeenLastCalledWith(expect.stringContaining("Stats: { active: true }"));
+
+      // 4. Object as metadata if last argument is plain object
+      devdoot.configure({ format: 'json' });
+      let lastJson: any;
+      const jsonSpy = vi.spyOn(process.stdout, 'write').mockImplementation((str) => {
+        lastJson = JSON.parse(str as string);
+        return true;
+      });
+      
+      try {
+        devdoot.info('Action completed', { code: 200 });
+        expect(lastJson.message).toBe('Action completed');
+        expect(lastJson.metadata).toEqual({ code: 200 });
+
+        devdoot.info('Multiple', 'args', { userId: 42 });
+        expect(lastJson.message).toBe('Multiple args');
+        expect(lastJson.metadata).toEqual({ userId: 42 });
+      } finally {
+        jsonSpy.mockRestore();
+      }
+    } finally {
+      consoleSpy.mockRestore();
+    }
+  });
+
   it('should support overloaded debug() chaining and deepDebugging bypass', () => {
     // 1. When deepDebugging is disabled
     devdoot.configure({ deepDebugging: false, format: 'console' });

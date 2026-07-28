@@ -7,6 +7,9 @@ All notable changes to the `devdoot` project will be documented in this file.
 ### Added
 - **Default Environment Variable Scanning**: Changed the default value of `allowEnv` from `false` to `true`. Devdoot now scans and loads environment configurations automatically on startup with zero setup code.
 - **New Environment Fallbacks (`DEVDOOT_DEFAULT_LEVEL`)**: Added support for reading logging level overrides from `DEVDOOT_DEFAULT_LEVEL` and `DEVDOOT_DEFAULT_LOG_LEVEL` environment variables.
+- **Inter-Log Timing Delta (`[+diff = total]`)**: Added support for calculating and displaying the elapsed milliseconds since the immediately preceding printed log (diff) side-by-side with the total relative time since start: `[+<diff> = <total>ms]`. This helps developers instantly spot slow execution operations and bottlenecks.
+- **Multiple Arguments Support (`console.log` style)**: All logging methods (`log`, `info`, `warn`, `error`, `success`, `debug`, `alert`) now accept an unlimited number of arguments (`...args: any[]`). Multiple arguments are automatically formatted and concatenated using Node's native `util.format` (supporting placeholders like `%s`, `%d`, `%o`). If the last argument is a plain object, it is automatically parsed as structured metadata to retain backward compatibility with the `(message, metadata)` signature.
+- **Automated End-to-End Packaging Tests**: Added a dynamic packaging integration test (`tests/npm-pack.test.ts`) that executes `npm pack`, installs the compiled tarball locally inside test CJS/ESM Node.js and TypeScript client projects, and runs them. This guarantees zero-defect npm publications.
 
 ## [0.0.7] - 2026-07-28
 

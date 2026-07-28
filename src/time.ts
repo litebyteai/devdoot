@@ -35,6 +35,18 @@ export function getRelativeMs(): number {
   return Date.now() - startPerfTime;
 }
 
+let lastLogMs = 0;
+
+/**
+ * Returns relative ms since start and diff ms since the last log statement.
+ */
+export function getTimingInfo(): { relativeMs: number; diffMs: number } {
+  const current = getRelativeMs();
+  const diffMs = current - lastLogMs;
+  lastLogMs = current;
+  return { relativeMs: current, diffMs };
+}
+
 /**
  * Formats high-precision milliseconds to +Xms string
  */

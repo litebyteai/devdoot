@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { getActiveTraceContext, runInTraceContext, TraceContext } from './context.js';
-import { getCachedTimestamp, getRelativeMs } from './time.js';
+import { getCachedTimestamp, getRelativeMs, getTimingInfo } from './time.js';
 import { getCallerInfo, CallerInfo } from './caller.js';
 import { globalConfig, LogLevel } from './config.js';
 import { getDiagnosticsSnapshot } from './diagnostics.js';
@@ -86,7 +86,7 @@ export class TraceNode {
     
     // Print end summary if in console mode
     if (globalConfig.enabled && globalConfig.format === 'console' && globalConfig.level <= LogLevel.INFO) {
-      const relTime = getRelativeMs();
+      const { relativeMs, diffMs } = getTimingInfo();
       const statusIcon = this.errorDetails ? '✗' : '✓';
       const statusText = this.errorDetails ? 'failed' : 'completed';
       const color = this.errorDetails ? '\x1b[31m' : '\x1b[32m';
@@ -94,7 +94,7 @@ export class TraceNode {
       
       const absTime = getCachedTimestamp();
       const timeStr = `\x1b[90m${absTime}\x1b[0m`;
-      const relTimeStr = `\x1b[90m[+${Math.round(relTime)}ms]\x1b[0m`;
+      const relTimeStr = `\x1b[90m[+${Math.round(diffMs)} = ${Math.round(relativeMs)}ms]\x1b[0m`;
       
       const output = `${timeStr} ${relTimeStr} ${color}${statusIcon} ${this.name} ${statusText} (Duration: ${durationText})\x1b[0m\n`;
       if (typeof process !== 'undefined') {
@@ -174,9 +174,10 @@ export function runTraced<T>(name: string, fn: (trace: TraceNode) => T): T {
   
   // Log start summary if console is active
   if (globalConfig.format === 'console' && globalConfig.level <= LogLevel.INFO) {
+    const { relativeMs, diffMs } = getTimingInfo();
     const absTime = getCachedTimestamp();
     const timeStr = `\x1b[90m${absTime}\x1b[0m`;
-    const relTimeStr = `\x1b[90m[+${Math.round(getRelativeMs())}ms]\x1b[0m`;
+    const relTimeStr = `\x1b[90m[+${Math.round(diffMs)} = ${Math.round(relativeMs)}ms]\x1b[0m`;
     const output = `${timeStr} ${relTimeStr} \x1b[36m${name}()\x1b[0m\n`;
     if (typeof process !== 'undefined') {
       process.stdout.write(output);

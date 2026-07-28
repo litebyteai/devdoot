@@ -6,6 +6,6 @@
     "demo": "node demo.js"
   },
   "dependencies": {
-    "devdoot": "latest"
+    "devdoot": "file:../../../devdoot-0.0.8.tgz"
   }
 }

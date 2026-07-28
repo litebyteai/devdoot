@@ -1,8 +1,15 @@
 import { DevdootConfig, LogLevel, LogLevelName, DevdootOptions, globalConfig } from './config.js';
-import { getCachedTimestamp, getRelativeMs, formatRelativeTime } from './time.js';
+import { getCachedTimestamp, getRelativeMs, formatRelativeTime, getTimingInfo } from './time.js';
 import { getCallerInfo, CallerInfo } from './caller.js';
 import { getActiveTraceContext } from './context.js';
 import { initCrashReporter, RegisterOptions } from './reporter.js';
+import { format } from 'node:util';
+
+function isPlainObject(val: any): boolean {
+  if (val === null || typeof val !== 'object') return false;
+  const proto = Object.getPrototypeOf(val);
+  return proto === null || proto === Object.prototype;
+}
 
 // Pre-define ANSI colors for console styling
 const COLORS = {
@@ -74,68 +81,84 @@ export class DevdootLogger {
     this.startGlobalTracking(options);
   }
 
-  trace(message: any, meta?: any): void {
+  trace(...args: any[]): void {
     if (this.isNoop || !this.config.enabled || this.config.level > LogLevel.TRACE) return;
-    this.write(LogLevel.TRACE, 'TRACE', message, meta);
+    this.writeLog('TRACE', args);
   }
 
   debug(): DevdootLogger;
-  debug(message: any, meta?: any): void;
-  debug(message?: any, meta?: any): void | DevdootLogger {
+  debug(...args: any[]): void;
+  debug(...args: any[]): void | DevdootLogger {
     if (this.isNoop || !this.config.enabled) {
-      return message === undefined ? NOOP_LOGGER : undefined;
+      return args.length === 0 ? NOOP_LOGGER : undefined;
     }
 
     if (this.config.deepDebugGroups && this.config.deepDebugGroups.length > 0) {
       const activeContext = getActiveTraceContext();
       const activeGroup = (activeContext ? activeContext.node.name : '') || this.currentGroup || '';
       if (!this.config.deepDebugGroups.includes(activeGroup)) {
-        return message === undefined ? NOOP_LOGGER : undefined;
+        return args.length === 0 ? NOOP_LOGGER : undefined;
       }
     }
 
-    if (message === undefined) {
+    if (args.length === 0) {
       if (!this.config.deepDebugging) {
         return NOOP_LOGGER;
       }
       return this;
     }
     if (this.config.level > LogLevel.DEBUG) return;
-    this.write(LogLevel.DEBUG, 'DEBUG', message, meta);
+    this.writeLog('DEBUG', args);
   }
 
-  info(message: any, meta?: any): void {
+  info(...args: any[]): void {
     if (this.isNoop || !this.config.enabled || this.config.level > LogLevel.INFO) return;
-    this.write(LogLevel.INFO, 'INFO', message, meta);
+    this.writeLog('INFO', args);
   }
 
-  log(message: any, meta?: any): void {
-    this.info(message, meta); // Alias for info
+  log(...args: any[]): void {
+    this.info(...args); // Alias for info
   }
 
-  warn(message: any, meta?: any): void {
+  warn(...args: any[]): void {
     if (this.isNoop || !this.config.enabled || this.config.level > LogLevel.WARN) return;
-    this.write(LogLevel.WARN, 'WARN', message, meta);
+    this.writeLog('WARN', args);
   }
 
-  error(message: any, meta?: any): void {
+  error(...args: any[]): void {
     if (this.isNoop || !this.config.enabled || this.config.level > LogLevel.ERROR) return;
-    this.write(LogLevel.ERROR, 'ERROR', message, meta);
+    this.writeLog('ERROR', args);
   }
 
-  status(message: any, meta?: any): void {
+  status(...args: any[]): void {
     if (this.isNoop || !this.config.enabled || this.config.level > LogLevel.INFO) return;
-    this.write(LogLevel.INFO, 'STATUS', message, meta);
+    this.writeLog('STATUS', args);
   }
 
-  alert(message: any, meta?: any): void {
+  alert(...args: any[]): void {
     if (this.isNoop || !this.config.enabled) return; // Alert always prints unless completely disabled
-    this.write(LogLevel.ERROR, 'ALERT', message, meta);
+    this.writeLog('ALERT', args);
   }
 
+  private writeLog(levelName: string, args: any[]): void {
+    if (args.length === 0) return;
 
+    let rawMessage: any;
+    let meta: any;
 
-  private write(levelValue: number, levelName: string, rawMessage: any, meta?: any): void {
+    if (this.config.format === 'json') {
+      if (args.length > 1 && isPlainObject(args[args.length - 1])) {
+        meta = args[args.length - 1];
+        const formatArgs = args.slice(0, -1);
+        rawMessage = formatArgs.length === 1 ? formatArgs[0] : format(formatArgs[0], ...formatArgs.slice(1));
+      } else {
+        rawMessage = args.length === 1 ? args[0] : format(args[0], ...args.slice(1));
+      }
+    } else {
+      // Console mode: format all arguments exactly like console.log
+      rawMessage = args.length === 1 ? args[0] : format(args[0], ...args.slice(1));
+    }
+
     // 1. Resolve lazy callback message
     let message = typeof rawMessage === 'function' ? rawMessage() : rawMessage;
 
@@ -144,6 +167,8 @@ export class DevdootLogger {
     if (message instanceof Error) {
       errorStack = message.stack;
       message = message.message;
+    } else if (typeof message !== 'string') {
+      message = format(message);
     }
 
     // 3. Capture caller info (only if configured and not skipped)
@@ -152,14 +177,14 @@ export class DevdootLogger {
       caller = getCallerInfo();
     }
 
-    const relTime = getRelativeMs();
+    const { relativeMs, diffMs } = getTimingInfo();
     const absTime = getCachedTimestamp();
     const activeContext = getActiveTraceContext();
 
     if (this.config.format === 'json') {
       const logObj: Record<string, any> = {
         time: absTime,
-        relativeMs: Math.round(relTime),
+        relativeMs: Math.round(relativeMs),
         level: levelName,
         message,
       };
@@ -186,7 +211,7 @@ export class DevdootLogger {
         callerStr = `  ${COLORS.gray}[${caller.callerLocation}]${COLORS.reset}`;
       }
 
-      const relTimeStr = ` ${COLORS.cyan}[${formatRelativeTime(relTime)}]${COLORS.reset}`;
+      const relTimeStr = ` ${COLORS.cyan}[+${Math.round(diffMs)} = ${Math.round(relativeMs)}ms]${COLORS.reset}`;
 
       let metaStr = '';
       if (meta) {
